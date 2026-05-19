@@ -13,6 +13,7 @@ import TimeSlotButton from "../../components/timeSlotButton.tsx";
 import { useAvailability } from "../../hooks/use-availability";
 import type { IUserRole } from "../../types/customer.type";
 import type {
+  AppointmentStatus,
   IAppointmentDetail,
   IAppointmentResponseData,
 } from "../../types/appointment.type";
@@ -107,6 +108,28 @@ function getUpdatedAppointment(
   return undefined;
 }
 
+const statusButtonMap: Record<
+  AppointmentStatus,
+  { label: string; className: string }
+> = {
+  PENDENTE: {
+    label: "Marcar como pendente",
+    className: "border-amber-500/30 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20",
+  },
+  CONFIRMADO: {
+    label: "Confirmar",
+    className: "border-cyan-500/30 bg-cyan-500/10 text-cyan-200 hover:bg-cyan-500/20",
+  },
+  CONCLUIDO: {
+    label: "Concluir",
+    className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20",
+  },
+  CANCELADO: {
+    label: "Cancelar",
+    className: "border-rose-500/30 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20",
+  },
+};
+
 const AppointmentDetails = () => {
   const navigate = useNavigate();
   const { appointmentId } = useParams();
@@ -116,7 +139,7 @@ const AppointmentDetails = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [actionMessage, setActionMessage] = useState("");
-  const [isCancelling, setIsCancelling] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isRescheduling, setIsRescheduling] = useState(false);
 
   const serviceIds = useMemo(() => {
@@ -176,34 +199,34 @@ const AppointmentDetails = () => {
     return availableSlots.find((slot) => slot.startTime === selectedTime) ?? null;
   }, [availableSlots, selectedTime]);
 
-  const handleCancelAppointment = async () => {
+  const handleUpdateStatus = async (status: AppointmentStatus) => {
     if (!appointment) {
       return;
     }
 
-    setIsCancelling(true);
+    setIsUpdatingStatus(true);
     setErrorMessage("");
     setActionMessage("");
 
     try {
       const response = await updateAppointmentStatusRequest(appointment.id, {
-        status: "CANCELADO",
+        status,
       });
 
       setAppointment((current) =>
-        current ? { ...current, status: "CANCELADO" } : current,
+        current ? { ...current, status } : current,
       );
-      setActionMessage(response.message || "Agendamento cancelado com sucesso.");
+      setActionMessage(response.message || "Status do agendamento atualizado com sucesso.");
     } catch (error) {
       if (error instanceof ApiRequestError) {
         setErrorMessage(error.message);
       } else if (error instanceof Error) {
         setErrorMessage(error.message);
       } else {
-        setErrorMessage("Nao foi possivel cancelar o agendamento.");
+        setErrorMessage("Nao foi possivel atualizar o status do agendamento.");
       }
     } finally {
-      setIsCancelling(false);
+      setIsUpdatingStatus(false);
     }
   };
 
@@ -383,14 +406,44 @@ const AppointmentDetails = () => {
                 )}
 
                 {!isCustomerView && (
-                  <button
-                    type="button"
-                    onClick={handleCancelAppointment}
-                    disabled={!canManageAppointment(appointment) || isCancelling}
-                    className="h-12 w-full rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 text-sm font-semibold text-rose-200 transition hover:bg-rose-500/20 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {isCancelling ? "Cancelando..." : "Cancelar agendamento"}
-                  </button>
+                  <div className="flex flex-col gap-3">
+                    <SectionTitle
+                      title="Status do agendamento"
+                      description="Atualize rapidamente o andamento do atendimento."
+                    />
+
+                    <div className="grid grid-cols-2 gap-3">
+                      {(
+                        [
+                          "PENDENTE",
+                          "CONFIRMADO",
+                          "CONCLUIDO",
+                          "CANCELADO",
+                        ] as AppointmentStatus[]
+                      ).map((status) => {
+                        const isActive = appointment.status === status;
+                        const buttonConfig = statusButtonMap[status];
+
+                        return (
+                          <button
+                            key={status}
+                            type="button"
+                            onClick={() => handleUpdateStatus(status)}
+                            disabled={isUpdatingStatus || isActive}
+                            className={`min-h-12 rounded-xl border px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                              isActive
+                                ? "border-white/20 bg-white text-slate-950"
+                                : buttonConfig.className
+                            }`}
+                          >
+                            {isUpdatingStatus && !isActive
+                              ? "Atualizando..."
+                              : buttonConfig.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 )}
 
                 {isCustomerView && (
