@@ -7,6 +7,7 @@ export function useAvailability(selectedDate: string, serviceIds: number[]) {
   const [availableSlots, setAvailableSlots] = useState<IAppointmentAvailabilitySlot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     async function loadAvailability() {
@@ -41,11 +42,16 @@ export function useAvailability(selectedDate: string, serviceIds: number[]) {
     }
 
     loadAvailability();
-  }, [selectedDate, serviceIds]);
+  }, [selectedDate, serviceIds, reloadKey]);
+
+  const refetch = () => {
+    setReloadKey((current) => current + 1);
+  };
 
   return {
     availableSlots,
     isLoading,
     errorMessage,
+    refetch,
   };
 }

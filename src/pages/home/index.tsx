@@ -5,6 +5,7 @@ import ServiceCard from "../../components/serviceCard";
 import SummaryCard from "../../components/summaryCard";
 import TimeSlotButton from "../../components/timeSlotButton.tsx";
 import { useAvailability } from "../../hooks/use-availability";
+import { useCreateAppointment } from "../../hooks/use-create-appointment";
 import { useServices } from "../../hooks/use-services";
 
 const Home = () => {
@@ -21,7 +22,16 @@ const Home = () => {
     availableSlots,
     isLoading: isLoadingAvailability,
     errorMessage: availabilityErrorMessage,
+    refetch: refetchAvailability,
   } = useAvailability(selectedDate, selectedServices);
+  const {
+    isLoading: isCreatingAppointment,
+    errorMessage: createAppointmentErrorMessage,
+    successMessage: createAppointmentSuccessMessage,
+    suggestionMessage,
+    submit: createAppointment,
+    clearMessages,
+  } = useCreateAppointment();
 
   const selectedServiceDetails = services.filter((service) =>
     selectedServices.includes(service.id),
@@ -61,6 +71,27 @@ const Home = () => {
   const handleDateChange = (date: string) => {
     setSelectedDate(date);
     setSelectedTime("");
+    clearMessages();
+  };
+
+  const handleCreateAppointment = async () => {
+    const selectedSlot = availableSlots.find(
+      (slot) => slot.startTime === selectedTime,
+    );
+
+    if (!selectedSlot) {
+      return;
+    }
+
+    const response = await createAppointment({
+      startDate: selectedSlot.startDateTime,
+      serviceIds: selectedServices,
+    });
+
+    if (response?.success) {
+      setSelectedTime("");
+      refetchAvailability();
+    }
   };
 
   const availabilityDescription =
@@ -71,7 +102,7 @@ const Home = () => {
         : "Escolha um horario livre para finalizar o agendamento.";
 
   return (
-    <div className="min-h-screen bg-slate-950 px-6 py-10 text-white">
+    <div className="min-h-screen bg-slate-950 px-6 py-10 text-white select-none">
       <div className="mx-auto flex max-w-5xl flex-col gap-8">
         <header className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-900 px-6 py-5">
           <SectionTitle
@@ -111,7 +142,10 @@ const Home = () => {
                     key={service.id}
                     service={service}
                     isSelected={selectedServices.includes(service.id)}
-                    onSelect={() => toggleService(service.id)}
+                    onSelect={() => {
+                      clearMessages();
+                      toggleService(service.id);
+                    }}
                     formatPrice={formatPrice}
                   />
                 ))}
@@ -158,9 +192,13 @@ const Home = () => {
                     disabled={
                       selectedServices.length === 0 ||
                       !selectedDate ||
-                      isLoadingAvailability
+                      isLoadingAvailability ||
+                      isCreatingAppointment
                     }
-                    onClick={() => setSelectedTime(slot.startTime)}
+                    onClick={() => {
+                      clearMessages();
+                      setSelectedTime(slot.startTime);
+                    }}
                   />
                 ))}
               </div>
@@ -182,6 +220,24 @@ const Home = () => {
             description="Confira os dados antes de confirmar"
           >
             <div className="flex flex-col gap-5">
+              {createAppointmentSuccessMessage && (
+                <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
+                  {createAppointmentSuccessMessage}
+                </div>
+              )}
+
+              {suggestionMessage && (
+                <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+                  {suggestionMessage}
+                </div>
+              )}
+
+              {createAppointmentErrorMessage && (
+                <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">
+                  {createAppointmentErrorMessage}
+                </div>
+              )}
+
               <div>
                 <p className="text-sm font-medium text-slate-400">Servicos</p>
 
@@ -236,11 +292,13 @@ const Home = () => {
                 disabled={
                   selectedServices.length === 0 ||
                   !selectedDate ||
-                  !selectedTime
+                  !selectedTime ||
+                  isCreatingAppointment
                 }
+                onClick={handleCreateAppointment}
                 className="h-12 rounded-xl bg-cyan-500 font-semibold text-slate-950 transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Confirmar agendamento
+                {isCreatingAppointment ? "Agendando..." : "Confirmar agendamento"}
               </button>
             </div>
           </SummaryCard>
