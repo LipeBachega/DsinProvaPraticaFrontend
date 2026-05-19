@@ -110,13 +110,23 @@ const Home = () => {
             description="Novo agendamento"
           />
 
-          <button
-            type="button"
-            onClick={() => navigate("/login")}
-            className="rounded-xl border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-cyan-500 hover:text-cyan-400"
-          >
-            Sair
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate("/appointments")}
+              className="rounded-xl border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-cyan-500 hover:text-cyan-400"
+            >
+              Meus agendamentos
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate("/login")}
+              className="rounded-xl border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-cyan-500 hover:text-cyan-400"
+            >
+              Sair
+            </button>
+          </div>
         </header>
 
         <div className="grid grid-cols-[1.4fr_0.8fr] gap-6">

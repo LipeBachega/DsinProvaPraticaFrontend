@@ -3,6 +3,7 @@ import type {
   IAppointmentAvailabilityQuery,
   IAppointmentAvailabilityResponse,
   IAppointmentCreateInput,
+  IAppointmentDetail,
   IAppointmentHistoryQuery,
   IAppointmentResponseData,
   IAppointmentStatusUpdateInput,
@@ -72,7 +73,7 @@ export async function getAppointmentHistoryRequest(
     headers: createAuthHeaders(),
   });
 
-  const data = (await response.json()) as IResponse<IAppointmentResponseData[]>;
+  const data = (await response.json()) as IResponse<IAppointmentDetail[]>;
 
   if (!response.ok || !data.success) {
     throw new ApiRequestError(
