@@ -1,4 +1,3 @@
-import ServiceCard from "../../../components/serviceCard";
 import SectionTitle from "../../../components/sectionTitle";
 import type { IService } from "../../../types/service.type";
 
@@ -21,33 +20,49 @@ const ServiceSelection = ({
 }: ServiceSelectionProps) => {
   return (
     <div>
-      {/* Esta seção cuida apenas do catálogo e da seleção visual dos serviços. */}
       <SectionTitle
-        title="1. Escolha os servicos"
-        description="Selecione um ou mais servicos para consultar os horarios vagos."
+        title="1. Escolha os serviços"
+        description="Selecione um ou mais serviços para consultar os horários disponíveis."
       />
 
-      <div className="flex flex-col gap-4">
-        {isLoading && (
-          <p className="text-sm text-slate-400">Carregando servicos...</p>
-        )}
+      {isLoading && (
+        <p className="text-sm text-slate-400">Carregando serviços...</p>
+      )}
 
-        {!isLoading && errorMessage && (
-          <p className="text-sm text-rose-300">{errorMessage}</p>
-        )}
+      {!isLoading && errorMessage && (
+        <p className="text-sm text-rose-300">{errorMessage}</p>
+      )}
 
-        {!isLoading &&
-          !errorMessage &&
-          services.map((service) => (
-            <ServiceCard
-              key={service.id}
-              service={service}
-              isSelected={selectedServices.includes(service.id)}
-              onSelect={() => onToggleService(service.id)}
-              formatPrice={formatPrice}
-            />
-          ))}
-      </div>
+      {!isLoading && !errorMessage && (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {services.map((service) => {
+            const isSelected = selectedServices.includes(service.id);
+
+            return (
+              <button
+                key={service.id}
+                type="button"
+                onClick={() => onToggleService(service.id)}
+                className={`rounded-2xl border p-5 text-left transition ${
+                  isSelected
+                    ? "border-cyan-500 bg-cyan-500/10"
+                    : "border-slate-800 bg-slate-950 hover:border-cyan-500/60"
+                }`}
+              >
+                <h3 className="text-lg font-semibold text-white">
+                  {service.serviceType}
+                </h3>
+                <p className="mt-1 text-sm text-slate-400">
+                  Duração de {service.estimatedTimeInMinutes} minutos
+                </p>
+                <p className="mt-4 text-base font-semibold text-cyan-300">
+                  {formatPrice(service.price)}
+                </p>
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

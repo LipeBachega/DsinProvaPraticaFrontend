@@ -28,7 +28,7 @@ export function useLogin() {
       });
 
       if (!response.data?.token) {
-        setErrorMessage("O login foi concluido sem token de autenticacao.");
+        setErrorMessage("O login foi concluído sem um token de autenticação.");
         return null;
       }
 
@@ -39,10 +39,10 @@ export function useLogin() {
         setErrorMessage(error.message);
       } else if (error instanceof TypeError) {
         setErrorMessage(
-          "Nao foi possivel conectar ao servidor. Verifique se o backend esta em execucao.",
+          "Não foi possível se conectar ao servidor. Verifique se o backend está em execução.",
         );
       } else {
-        setErrorMessage("Nao foi possivel realizar o login.");
+        setErrorMessage("Não foi possível realizar o login.");
       }
 
       return null;

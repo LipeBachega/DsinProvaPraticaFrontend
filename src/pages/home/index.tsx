@@ -103,10 +103,10 @@ const Home = () => {
 
   const availabilityDescription =
     selectedServices.length === 0
-      ? "Escolha ao menos um servico para liberar a busca de horarios."
+      ? "Escolha ao menos um serviço para liberar a busca de horários."
       : !selectedDate
-        ? "Selecione um dia para ver os horarios disponiveis."
-        : "Escolha um horario livre para finalizar o agendamento.";
+        ? "Selecione uma data para ver os horários disponíveis."
+        : "Escolha um horário livre para finalizar o agendamento.";
 
   return (
     <div className="min-h-screen select-none bg-slate-950 px-6 py-10 text-white">

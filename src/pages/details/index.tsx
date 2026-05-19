@@ -7,7 +7,10 @@ import {
 } from "../../api/appointment";
 import { ApiRequestError } from "../../api/shared";
 import { useAvailability } from "../../hooks/use-availability";
-import type { AppointmentStatus, IAppointmentDetail } from "../../types/appointment.type";
+import type {
+  AppointmentStatus,
+  IAppointmentDetail,
+} from "../../types/appointment.type";
 import { formatCurrency } from "../../utils/currency";
 import { formatDateTime, formatHour } from "../../utils/date";
 import AppointmentOverview from "./components/AppointmentOverview";
@@ -54,7 +57,7 @@ const AppointmentDetails = () => {
   useEffect(() => {
     async function loadAppointment() {
       if (!appointmentId) {
-        setErrorMessage("Agendamento nao encontrado.");
+        setErrorMessage("Agendamento não encontrado.");
         setIsLoading(false);
         return;
       }
@@ -71,14 +74,14 @@ const AppointmentDetails = () => {
         } else if (error instanceof Error) {
           setErrorMessage(error.message);
         } else {
-          setErrorMessage("Nao foi possivel carregar os detalhes do agendamento.");
+          setErrorMessage("Não foi possível carregar os detalhes do agendamento.");
         }
       } finally {
         setIsLoading(false);
       }
     }
 
-    loadAppointment();
+    void loadAppointment();
   }, [appointmentId]);
 
   const canReschedule = useMemo(() => {
@@ -117,7 +120,7 @@ const AppointmentDetails = () => {
       } else if (error instanceof Error) {
         setErrorMessage(error.message);
       } else {
-        setErrorMessage("Nao foi possivel atualizar o status do agendamento.");
+        setErrorMessage("Não foi possível atualizar o status do agendamento.");
       }
     } finally {
       setIsUpdatingStatus(false);
@@ -142,7 +145,7 @@ const AppointmentDetails = () => {
       const updatedAppointment = getUpdatedAppointment(response.data);
 
       if (!updatedAppointment) {
-        setErrorMessage("Nao foi possivel carregar o agendamento atualizado.");
+        setErrorMessage("Não foi possível carregar o agendamento atualizado.");
         return;
       }
 
@@ -156,7 +159,7 @@ const AppointmentDetails = () => {
       } else if (error instanceof Error) {
         setErrorMessage(error.message);
       } else {
-        setErrorMessage("Nao foi possivel reagendar o agendamento.");
+        setErrorMessage("Não foi possível reagendar o agendamento.");
       }
     } finally {
       setIsRescheduling(false);

@@ -5,38 +5,27 @@ import type {
   IAppointmentDetail,
   IAppointmentHistoryQuery,
 } from "../types/appointment.type";
-import { formatDateToInput } from "../utils/date";
 
-function getDefaultPeriod(): IAppointmentHistoryQuery {
-  // Abrimos o histórico com uma janela grande para evitar que a tela nasça vazia.
-  const now = new Date();
-  const startDate = new Date(now.getFullYear() - 1, 0, 1);
-  const endDate = new Date(now.getFullYear() + 1, 11, 31);
-
-  return {
-    startDate: formatDateToInput(startDate),
-    endDate: formatDateToInput(endDate),
-    search: "",
-  };
-}
+const defaultPeriod: IAppointmentHistoryQuery = {
+  startDate: "2025-01-01",
+  endDate: "2027-12-31",
+  search: "",
+};
 
 export function useAppointmentsHistory() {
-  // A página de histórico depende de período, lista, loading e erro.
-  const [period, setPeriod] = useState<IAppointmentHistoryQuery>(getDefaultPeriod);
+  const [period, setPeriod] = useState<IAppointmentHistoryQuery>(defaultPeriod);
   const [appointments, setAppointments] = useState<IAppointmentDetail[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    if (period.startDate > period.endDate) {
-      setAppointments([]);
-      setIsLoading(false);
-      setErrorMessage("A data inicial nao pode ser maior que a data final.");
-      return;
-    }
-
     async function loadHistory() {
-      // Cada mudança no período dispara uma nova leitura no backend.
+      if (period.startDate > period.endDate) {
+        setAppointments([]);
+        setErrorMessage("A data inicial não pode ser maior que a data final.");
+        return;
+      }
+
       setIsLoading(true);
       setErrorMessage("");
 
@@ -44,19 +33,17 @@ export function useAppointmentsHistory() {
         const response = await getAppointmentHistoryRequest(period);
         setAppointments(response.data ?? []);
       } catch (error) {
-        setAppointments([]);
-
         if (error instanceof ApiRequestError) {
           setErrorMessage(error.message);
         } else {
-          setErrorMessage("Nao foi possivel carregar o historico de agendamentos.");
+          setErrorMessage("Não foi possível carregar o histórico de agendamentos.");
         }
       } finally {
         setIsLoading(false);
       }
     }
 
-    loadHistory();
+    void loadHistory();
   }, [period]);
 
   return {

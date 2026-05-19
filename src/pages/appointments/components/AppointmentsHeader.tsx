@@ -15,8 +15,8 @@ const AppointmentsHeader = ({
         title={isAdminView ? "Agenda administrativa" : "Meus agendamentos"}
         description={
           isAdminView
-            ? "Visualize todos os agendamentos e encontre clientes por nome ou telefone."
-            : "Acompanhe todos os horarios do cliente por status."
+            ? "Acompanhe todos os agendamentos e encontre clientes por nome ou telefone."
+            : "Acompanhe seus horários agendados e filtre por status."
         }
       />
 

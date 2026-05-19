@@ -17,15 +17,15 @@ export async function loginRequest(payload: ILogin) {
     data = (await response.json()) as IResponse<ILoginResponseData>;
   } catch {
     if (!response.ok) {
-      throw new ApiRequestError("Nao foi possivel realizar o login.");
+      throw new ApiRequestError("Não foi possível realizar o login.");
     }
 
-    throw new ApiRequestError("Resposta invalida recebida ao realizar login.");
+    throw new ApiRequestError("Recebemos uma resposta inválida ao tentar entrar.");
   }
 
   if (!response.ok || !data.success) {
     throw new ApiRequestError(
-      data.message || "Nao foi possivel realizar o login.",
+      data.message || "Não foi possível realizar o login.",
       data.error,
     );
   }

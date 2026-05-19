@@ -1,5 +1,9 @@
 import SectionTitle from "../../../components/sectionTitle";
-import type { AppointmentStatus, IAppointmentAvailabilitySlot, IAppointmentDetail } from "../../../types/appointment.type";
+import type {
+  AppointmentStatus,
+  IAppointmentAvailabilitySlot,
+  IAppointmentDetail,
+} from "../../../types/appointment.type";
 import RescheduleSection from "./RescheduleSection";
 import StatusManagementSection from "./StatusManagementSection";
 
@@ -45,25 +49,25 @@ const DetailsActionsSection = ({
   onConfirmReschedule,
 }: DetailsActionsSectionProps) => {
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+    <aside className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
       <SectionTitle
-        title="Acoes"
+        title="Ações"
         description="Gerencie este agendamento sem sair da tela de detalhes."
       />
 
-      {errorMessage && (
-        <p className="mb-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">
-          {errorMessage}
-        </p>
-      )}
-
       {actionMessage && (
-        <p className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
+        <div className="mt-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
           {actionMessage}
-        </p>
+        </div>
       )}
 
-      {!isCustomerView && (
+      {errorMessage && (
+        <div className="mt-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">
+          {errorMessage}
+        </div>
+      )}
+
+      {!isCustomerView && canManageAppointment && (
         <StatusManagementSection
           appointment={appointment}
           isUpdatingStatus={isUpdatingStatus}
@@ -72,28 +76,27 @@ const DetailsActionsSection = ({
       )}
 
       {isCustomerView && (
-        <div className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-4 text-sm text-amber-200">
-          Cancelamentos so podem ser feitos por telefone. Alteracoes de data com
-          menos de 2 dias de antecedencia tambem devem ser solicitadas por
-          telefone.
+        <div className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+          Cancelamentos devem ser feitos por telefone. Alterações com menos de 2
+          dias de antecedência também precisam ser feitas por telefone.
         </div>
       )}
 
       {!canManageAppointment && (
-        <p className="mt-4 text-sm text-slate-400">
-          Este agendamento nao permite novas alteracoes porque ja foi finalizado
+        <div className="mt-6 rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-300">
+          Este agendamento não permite novas alterações porque já foi finalizado
           ou cancelado.
-        </p>
-      )}
-
-      {canManageAppointment && !canReschedule && (
-        <div className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-4 text-sm text-amber-200">
-          Alteracoes com menos de 2 dias de antecedencia devem ser feitas por
-          telefone, conforme a regra do desafio.
         </div>
       )}
 
-      {canReschedule && (
+      {canManageAppointment && !canReschedule && (
+        <div className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+          Este agendamento só pode ser alterado por telefone neste momento,
+          conforme a regra do desafio.
+        </div>
+      )}
+
+      {canManageAppointment && canReschedule && (
         <RescheduleSection
           selectedDate={selectedDate}
           selectedTime={selectedTime}
@@ -107,7 +110,7 @@ const DetailsActionsSection = ({
           onConfirmReschedule={onConfirmReschedule}
         />
       )}
-    </section>
+    </aside>
   );
 };
 

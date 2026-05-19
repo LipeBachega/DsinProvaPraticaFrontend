@@ -32,8 +32,8 @@ const AppointmentsFilters = ({
         title="Filtros"
         description={
           isAdminView
-            ? "Escolha o periodo, o status e filtre clientes por nome ou telefone."
-            : "Escolha o periodo e o status que deseja visualizar."
+            ? "Escolha o período, o status e filtre clientes por nome ou telefone."
+            : "Escolha o período e o status que deseja visualizar."
         }
       />
 
@@ -69,7 +69,7 @@ const AppointmentsFilters = ({
               type="text"
               value={period.search ?? ""}
               onChange={onPeriodChange("search")}
-              placeholder="Ex.: teste2 ou 14999990002"
+              placeholder="Ex.: Maria ou 14999990002"
               className="h-12 rounded-xl border border-slate-700 bg-slate-950 px-4 text-white outline-none transition focus:border-cyan-500"
             />
           </div>
@@ -78,7 +78,7 @@ const AppointmentsFilters = ({
 
       {isPeriodInvalid && (
         <p className="mt-3 text-sm text-amber-300">
-          A data inicial nao pode ser maior que a data final.
+          A data inicial não pode ser maior que a data final.
         </p>
       )}
 

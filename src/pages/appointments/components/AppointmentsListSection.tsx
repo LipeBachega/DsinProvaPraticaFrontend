@@ -24,11 +24,11 @@ const AppointmentsListSection = ({
   return (
     <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
       <SectionTitle
-        title={isAdminView ? "Todos os agendamentos" : "Historico do cliente"}
+        title={isAdminView ? "Todos os agendamentos" : "Histórico de agendamentos"}
         description={
           isAdminView
-            ? "Resultados encontrados para o periodo e filtros informados."
-            : "Todos os agendamentos encontrados no periodo selecionado."
+            ? "Resultados encontrados com base no período e nos filtros informados."
+            : "Confira todos os agendamentos encontrados no período selecionado."
         }
       />
 
@@ -42,7 +42,7 @@ const AppointmentsListSection = ({
 
       {!isLoading && !errorMessage && appointments.length === 0 && (
         <p className="text-sm text-slate-400">
-          Nenhum agendamento encontrado para este filtro.
+          Nenhum agendamento foi encontrado para este filtro.
         </p>
       )}
 

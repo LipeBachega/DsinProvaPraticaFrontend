@@ -18,7 +18,7 @@ export const statusLabelMap: Record<AppointmentStatus, string> = {
   PENDENTE: "Pendentes",
   CONFIRMADO: "Confirmados",
   CANCELADO: "Cancelados",
-  CONCLUIDO: "Concluidos",
+  CONCLUIDO: "Concluídos",
 };
 
 export const statusClassMap: Record<AppointmentStatus, string> = {

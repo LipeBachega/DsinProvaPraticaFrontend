@@ -10,18 +10,18 @@ const DateSelection = ({
   onChangeDate,
 }: DateSelectionProps) => {
   return (
-    // Extraímos a data para manter a home principal focada na orquestração do fluxo.
-    <div className="mt-10">
+    <div className="mt-8">
       <SectionTitle
         title="2. Escolha o dia"
-        description="A exibicao de horarios sera baseada no dia selecionado."
+        description="A exibição dos horários será baseada na data selecionada."
       />
 
       <input
         type="date"
         value={selectedDate}
+        min={new Date().toISOString().split("T")[0]}
         onChange={(event) => onChangeDate(event.target.value)}
-        className="mt-4 h-12 w-64 rounded-xl border border-slate-700 bg-slate-950 px-4 text-white outline-none transition focus:border-cyan-500"
+        className="h-12 w-full rounded-xl border border-slate-700 bg-slate-950 px-4 text-white outline-none transition focus:border-cyan-500"
       />
     </div>
   );

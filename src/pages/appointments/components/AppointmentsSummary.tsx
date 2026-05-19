@@ -31,7 +31,7 @@ const AppointmentsSummary = ({ counters }: AppointmentsSummaryProps) => {
           {counters.cancelados}
         </p>
       </SummaryCard>
-      <SummaryCard title="Concluidos">
+      <SummaryCard title="Concluídos">
         <p className="text-3xl font-semibold text-white">
           {counters.concluidos}
         </p>

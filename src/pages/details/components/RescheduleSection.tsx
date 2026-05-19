@@ -32,7 +32,7 @@ const RescheduleSection = ({
     <div className="mt-6">
       <SectionTitle
         title="Reagendar"
-        description="Escolha uma nova data e selecione um horario disponivel."
+        description="Escolha uma nova data e selecione um horário disponível."
       />
 
       <input
@@ -45,7 +45,7 @@ const RescheduleSection = ({
 
       {isLoadingAvailability && (
         <p className="mt-4 text-sm text-slate-400">
-          Buscando horarios disponiveis...
+          Buscando horários disponíveis...
         </p>
       )}
 
@@ -70,7 +70,7 @@ const RescheduleSection = ({
         !availabilityErrorMessage &&
         availableSlots.length === 0 && (
           <p className="mt-4 text-sm text-amber-400">
-            Nenhum horario disponivel para a nova data escolhida.
+            Não há horários disponíveis para a nova data escolhida.
           </p>
         )}
 

@@ -1,5 +1,8 @@
 import SectionTitle from "../../../components/sectionTitle";
-import type { AppointmentStatus, IAppointmentDetail } from "../../../types/appointment.type";
+import type {
+  AppointmentStatus,
+  IAppointmentDetail,
+} from "../../../types/appointment.type";
 import { statusButtonMap } from "../utils";
 
 interface StatusManagementSectionProps {
@@ -22,7 +25,12 @@ const StatusManagementSection = ({
 
       <div className="grid grid-cols-2 gap-3">
         {(
-          ["PENDENTE", "CONFIRMADO", "CONCLUIDO", "CANCELADO"] as AppointmentStatus[]
+          [
+            "PENDENTE",
+            "CONFIRMADO",
+            "CONCLUIDO",
+            "CANCELADO",
+          ] as AppointmentStatus[]
         ).map((status) => {
           const isActive = appointment.status === status;
           const buttonConfig = statusButtonMap[status];

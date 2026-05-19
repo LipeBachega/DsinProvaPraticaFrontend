@@ -1,12 +1,11 @@
 import { useState, type SyntheticEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import Button from "../../components/button";
 import Card from "../../components/card";
 import Input from "../../components/input";
-import Button from "../../components/button";
 import { useSignUp } from "../../hooks/use-signup";
 
 const SignUp = () => {
-  // A tela mantém apenas os valores brutos; validação e envio ficam no hook.
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -18,7 +17,6 @@ const SignUp = () => {
   const handleSignUp = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Enviamos todos os campos exigidos pelo backend de cliente.
     const response = await submit({
       name,
       email,
@@ -27,23 +25,22 @@ const SignUp = () => {
     });
 
     if (response?.success) {
-      // Após cadastro bem-sucedido, voltamos ao login com uma mensagem de contexto.
       navigate("/login", {
         state: {
-          successMessage: "Conta criada com sucesso. Agora voce ja pode entrar.",
+          successMessage: "Conta criada com sucesso. Agora você já pode entrar.",
         },
       });
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
       <Card>
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white">Criar conta</h1>
 
-          <p className="text-slate-400 mt-2">
-            Cadastre-se para acessar o sistema
+          <p className="mt-2 text-slate-400">
+            Cadastre-se para começar a agendar online
           </p>
         </div>
 
@@ -54,7 +51,6 @@ const SignUp = () => {
         )}
 
         <form onSubmit={handleSignUp} className="flex flex-col gap-5">
-          {/* Erros por campo são exibidos logo abaixo do input correspondente. */}
           <Input
             label="Nome"
             type="text"
@@ -107,7 +103,7 @@ const SignUp = () => {
 
           <Button
             type="button"
-            title="Voltar"
+            title="Voltar para o login"
             disabled={isLoading}
             onClick={() => navigate("/login")}
           />

@@ -3,7 +3,6 @@ import type IResponse from "../types/response.type";
 import { API_URL, ApiRequestError } from "./shared";
 
 export async function signUpRequest(payload: ICustomerCreate) {
-  // O cadastro cria um novo cliente comum no backend.
   const response = await fetch(`${API_URL}/customers`, {
     method: "POST",
     headers: {
@@ -16,7 +15,7 @@ export async function signUpRequest(payload: ICustomerCreate) {
 
   if (!response.ok || !data.success) {
     throw new ApiRequestError(
-      data.message || "Nao foi possivel concluir o cadastro.",
+      data.message || "Não foi possível concluir o cadastro.",
       data.error,
     );
   }

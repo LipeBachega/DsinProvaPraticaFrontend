@@ -1,59 +1,86 @@
 import { useEffect, useMemo, useState } from "react";
 import { getAppointmentHistoryRequest } from "../api/appointment";
 import { ApiRequestError } from "../api/shared";
-import type { IAppointmentDetail } from "../types/appointment.type";
-import { formatDateTime, getWeekRangeFromDate } from "../utils/date";
+import { formatDateTime } from "../utils/date";
+
+function getWeekRange(selectedDate: string) {
+  const date = new Date(`${selectedDate}T12:00:00`);
+  const day = date.getDay();
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+
+  const weekStart = new Date(date);
+  weekStart.setDate(date.getDate() + diffToMonday);
+
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+
+  const toInputDate = (value: Date) => value.toISOString().split("T")[0];
+
+  return {
+    startDate: toInputDate(weekStart),
+    endDate: toInputDate(weekEnd),
+  };
+}
 
 export function useWeeklyAppointmentWarning(
   selectedDate: string,
-  selectedServiceIds: number[],
+  serviceIds: number[],
 ) {
-  // Esta checagem avisa antes da confirmação se já existe outro agendamento na mesma semana.
-  const [appointments, setAppointments] = useState<IAppointmentDetail[]>([]);
+  const [hasWeeklyAppointment, setHasWeeklyAppointment] = useState(false);
+  const [warningDate, setWarningDate] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  const serviceIdsKey = useMemo(() => serviceIds.join(","), [serviceIds]);
+
   useEffect(() => {
-    async function loadWeekAppointments() {
-      // A checagem só faz sentido quando o usuário já tomou as duas decisões iniciais.
-      if (!selectedDate || selectedServiceIds.length === 0) {
-        setAppointments([]);
+    async function loadWarning() {
+      if (!selectedDate || serviceIds.length === 0) {
+        setHasWeeklyAppointment(false);
+        setWarningDate("");
         setErrorMessage("");
         return;
       }
 
+      setErrorMessage("");
+
       try {
-        // Em vez de "adivinhar", consultamos o histórico real do cliente no período da semana.
-        const period = getWeekRangeFromDate(selectedDate);
-        const response = await getAppointmentHistoryRequest(period);
-        setAppointments(response.data ?? []);
+        const { startDate, endDate } = getWeekRange(selectedDate);
+        const response = await getAppointmentHistoryRequest({
+          startDate,
+          endDate,
+        });
+
+        const firstAppointment = (response.data ?? [])[0];
+
+        setHasWeeklyAppointment(Boolean(firstAppointment));
+        setWarningDate(firstAppointment?.startDate?.toString() ?? "");
       } catch (error) {
-        setAppointments([]);
+        setHasWeeklyAppointment(false);
+        setWarningDate("");
 
         if (error instanceof ApiRequestError) {
           setErrorMessage(error.message);
         } else {
-          setErrorMessage("Nao foi possivel verificar agendamentos da mesma semana.");
+          setErrorMessage(
+            "Não foi possível verificar se já existe um agendamento nesta semana.",
+          );
         }
       }
     }
 
-    loadWeekAppointments();
-  }, [selectedDate, selectedServiceIds]);
+    void loadWarning();
+  }, [selectedDate, serviceIds, serviceIdsKey]);
 
   const warningMessage = useMemo(() => {
-    if (!selectedDate || appointments.length === 0) {
+    if (!hasWeeklyAppointment || !warningDate) {
       return "";
     }
 
-    // Mostramos a primeira data encontrada para deixar o aviso mais útil e concreto.
-    const firstAppointment = appointments[0];
-    const formattedDate = formatDateTime(firstAppointment.startDate);
-
-    return `Voce ja possui um agendamento nesta semana em ${formattedDate}.`;
-  }, [appointments, selectedDate]);
+    return `Você já possui um agendamento nesta semana em ${formatDateTime(warningDate)}. Considere concentrar os serviços na mesma data.`;
+  }, [hasWeeklyAppointment, warningDate]);
 
   return {
-    hasWeeklyAppointment: appointments.length > 0,
+    hasWeeklyAppointment,
     warningMessage,
     errorMessage,
   };
