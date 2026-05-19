@@ -11,10 +11,8 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    console.log({
-      email,
-      password,
-    });
+    console.log({ email, password });
+    navigate("/home");
   };
 
   return (

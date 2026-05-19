@@ -12,11 +12,7 @@ const SignUp = () => {
   const navigate = useNavigate();
 
   const handleSignUp = () => {
-    console.log({
-      name,
-      email,
-      password,
-    });
+    console.log({ name, email, password });
   };
 
   return (
