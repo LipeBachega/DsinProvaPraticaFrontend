@@ -34,6 +34,8 @@ const Appointments = () => {
     );
   }, [activeFilter, appointments]);
 
+  // aqui contamos o total de cada status para mostrar no resumo
+  // usei useMemo para evitar que a contagem mude apenas se appointments mudar.
   const counters = useMemo(() => {
     return {
       total: appointments.length,

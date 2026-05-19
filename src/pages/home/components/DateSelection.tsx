@@ -19,7 +19,7 @@ const DateSelection = ({
       <input
         type="date"
         value={selectedDate}
-        min={new Date().toISOString().split("T")[0]}
+        min={new Date().toISOString().split("T")[0]} // aqui é a data atual, impedindo a seleção de datas passadas.
         onChange={(event) => onChangeDate(event.target.value)}
         className="h-12 w-full rounded-xl border border-slate-700 bg-slate-950 px-4 text-white outline-none transition focus:border-cyan-500"
       />

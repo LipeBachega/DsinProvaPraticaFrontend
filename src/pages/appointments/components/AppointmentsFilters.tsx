@@ -8,12 +8,13 @@ import {
 } from "../utils";
 
 interface AppointmentsFiltersProps {
-  activeFilter: AppointmentFilter;
-  isAdminView: boolean;
-  isPeriodInvalid: boolean;
-  period: IAppointmentHistoryQuery;
-  onFilterChange: (filter: AppointmentFilter) => void;
+  activeFilter: AppointmentFilter; // o filtro ativo, para sabermos qual botão destacar e quais agendamento mostrar
+  isAdminView: boolean; // se o usuário é admin ou cliente
+  isPeriodInvalid: boolean; // se a data inicial é maior que a data final
+  period: IAppointmentHistoryQuery; // a data inicial e final escolhidas pelo usuário
+  onFilterChange: (filter: AppointmentFilter) => void; // o filtro é alterado quando o usuário clica em um botão
   onPeriodChange: (
+    // o campo de data é alterado quando o usuário clica em um botão
     field: "startDate" | "endDate" | "search",
   ) => (event: ChangeEvent<HTMLInputElement>) => void;
 }
@@ -43,7 +44,10 @@ const AppointmentsFilters = ({
           <input
             type="date"
             value={period.startDate}
-            onChange={onPeriodChange("startDate")}
+            // Utilizamos Currying para criar um handler genérico.
+            // Isso permite que o mesmo componente trate diferentes campos (start, end, search)
+            // de forma limpa e sem repetir lógica de atualização de estado no pai.
+            onChange={onPeriodChange("startDate")} // aqui passamos o campo que queremos atualizar para o handler genérico que está no pai.
             max={period.endDate}
             className="h-12 w-52 rounded-xl border border-slate-700 bg-slate-950 px-4 text-white outline-none transition focus:border-cyan-500"
           />
@@ -60,6 +64,8 @@ const AppointmentsFilters = ({
           />
         </div>
 
+        {/* Aqui mostramos o campo de busca para clientes ou telefones. 
+        é renderizado apenas no modo admin */}
         {isAdminView && (
           <div className="flex flex-1 flex-col gap-2">
             <label className="text-sm text-slate-300">
@@ -76,6 +82,8 @@ const AppointmentsFilters = ({
         )}
       </div>
 
+      {/* Aqui mostramos a mensagem de erro caso o usuario tenha escolhido uma data inválida */}
+
       {isPeriodInvalid && (
         <p className="mt-3 text-sm text-amber-300">
           A data inicial não pode ser maior que a data final.
@@ -90,6 +98,8 @@ const AppointmentsFilters = ({
           return (
             <button
               key={filter}
+              // Garantimos que o botão tenha 'type="button"' para evitar que ele submeta
+              // formulários acidentalmente, já que este componente vive dentro de uma seção de filtros.
               type="button"
               onClick={() => onFilterChange(filter)}
               className={`rounded-xl border px-4 py-2 text-sm font-medium transition ${

@@ -26,6 +26,8 @@ export async function getAvailabilityRequest(
   query: IAppointmentAvailabilityQuery,
 ) {
   // A disponibilidade depende da data escolhida e da combinação de serviços.
+
+  // URLSearchParams é uma forma fácil de construir a query string para o fetch, evitando erros de formatação.
   const params = new URLSearchParams();
   params.set("date", query.date);
   params.set("serviceIds", query.serviceIds.join(","));
@@ -45,6 +47,11 @@ export async function getAvailabilityRequest(
     (await response.json()) as IResponse<IAppointmentAvailabilityResponse>;
 
   if (!response.ok || !data.success) {
+    // caso o backend retorne um erro, armazenamos a mensagem de erro.
+    // a ideia é mostrar essa mensagem para o cliente, para que ele entenda o que aconteceu.
+    // usamos nossa própria classe de erro extendida para acessar as mensagens de erro e nao precisamos
+    // de um catch global.
+    // garantimos que a mensagem de erro seja entregue ao hook de forma estruturada que ele já espera
     throw new ApiRequestError(
       data.message || "Nao foi possivel consultar a disponibilidade.",
       data.error,
