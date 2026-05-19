@@ -1,40 +1,20 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const services = [
-  {
-    id: 1,
-    name: "Corte de Cabelo",
-    price: 50,
-    duration: 60,
-  },
-  {
-    id: 2,
-    name: "Manicure",
-    price: 35,
-    duration: 45,
-  },
-  {
-    id: 3,
-    name: "Pintura",
-    price: 120,
-    duration: 120,
-  },
-];
-
-const availableSlotsByDay: Record<string, string[]> = {
-  "2026-05-20": ["09:00", "10:30", "14:00", "16:30"],
-  "2026-05-21": ["08:00", "11:00", "13:30", "15:00"],
-  "2026-05-22": ["09:30", "12:00", "17:00"],
-};
+import { useAvailability } from "../../hooks/use-availability";
+import { useServices } from "../../hooks/use-services";
 
 const Home = () => {
   const navigate = useNavigate();
+  const { services, isLoading: isLoadingServices, errorMessage: servicesErrorMessage } =
+    useServices();
   const [selectedServices, setSelectedServices] = useState<number[]>([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
-
-  const availableSlots = selectedDate ? availableSlotsByDay[selectedDate] ?? [] : [];
+  const {
+    availableSlots,
+    isLoading: isLoadingAvailability,
+    errorMessage: availabilityErrorMessage,
+  } = useAvailability(selectedDate, selectedServices);
 
   const selectedServiceDetails = services.filter((service) =>
     selectedServices.includes(service.id),
@@ -48,7 +28,10 @@ const Home = () => {
   };
 
   const totalDuration = useMemo(() => {
-    return selectedServiceDetails.reduce((total, service) => total + service.duration, 0);
+    return selectedServiceDetails.reduce(
+      (total, service) => total + service.estimatedTimeInMinutes,
+      0,
+    );
   }, [selectedServiceDetails]);
 
   const totalPrice = useMemo(() => {
@@ -98,35 +81,47 @@ const Home = () => {
             </div>
 
             <div className="flex flex-col gap-4">
-              {services.map((service) => {
-                const isSelected = selectedServices.includes(service.id);
+              {isLoadingServices && (
+                <p className="text-sm text-slate-400">Carregando servicos...</p>
+              )}
 
-                return (
-                  <button
-                    key={service.id}
-                    type="button"
-                    onClick={() => toggleService(service.id)}
-                    className={`rounded-2xl border p-5 text-left transition ${
-                      isSelected
-                        ? "border-cyan-500 bg-cyan-500/10"
-                        : "border-slate-800 bg-slate-950 hover:border-slate-700"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold text-white">{service.name}</h3>
-                        <p className="mt-1 text-sm text-slate-400">
-                          Duracao de {service.duration} minutos
-                        </p>
+              {!isLoadingServices && servicesErrorMessage && (
+                <p className="text-sm text-rose-300">{servicesErrorMessage}</p>
+              )}
+
+              {!isLoadingServices &&
+                !servicesErrorMessage &&
+                services.map((service) => {
+                  const isSelected = selectedServices.includes(service.id);
+
+                  return (
+                    <button
+                      key={service.id}
+                      type="button"
+                      onClick={() => toggleService(service.id)}
+                      className={`rounded-2xl border p-5 text-left transition ${
+                        isSelected
+                          ? "border-cyan-500 bg-cyan-500/10"
+                          : "border-slate-800 bg-slate-950 hover:border-slate-700"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="text-lg font-semibold text-white">
+                            {service.serviceType}
+                          </h3>
+                          <p className="mt-1 text-sm text-slate-400">
+                            Duracao de {service.estimatedTimeInMinutes} minutos
+                          </p>
+                        </div>
+
+                        <span className="text-base font-semibold text-cyan-400">
+                          {formatPrice(service.price)}
+                        </span>
                       </div>
-
-                      <span className="text-base font-semibold text-cyan-400">
-                        {formatPrice(service.price)}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
+                    </button>
+                  );
+                })}
             </div>
 
             <div className="mt-10">
@@ -153,33 +148,49 @@ const Home = () => {
                     : "Escolha um horario livre para finalizar o agendamento."}
               </p>
 
+              {isLoadingAvailability && (
+                <p className="mt-4 text-sm text-slate-400">Buscando horarios disponiveis...</p>
+              )}
+
+              {!isLoadingAvailability && availabilityErrorMessage && (
+                <p className="mt-4 text-sm text-rose-300">{availabilityErrorMessage}</p>
+              )}
+
               <div className="mt-4 flex flex-wrap gap-3">
                 {availableSlots.map((slot) => {
-                  const isSelected = selectedTime === slot;
+                  const isSelected = selectedTime === slot.startTime;
 
                   return (
                     <button
-                      key={slot}
+                      key={slot.startDateTime}
                       type="button"
-                      disabled={selectedServices.length === 0 || !selectedDate}
-                      onClick={() => setSelectedTime(slot)}
+                      disabled={
+                        selectedServices.length === 0 ||
+                        !selectedDate ||
+                        isLoadingAvailability
+                      }
+                      onClick={() => setSelectedTime(slot.startTime)}
                       className={`min-w-24 rounded-xl border px-4 py-3 text-sm font-semibold transition ${
                         isSelected
                           ? "border-cyan-500 bg-cyan-500 text-slate-950"
                           : "border-slate-700 bg-slate-950 text-slate-200 hover:border-cyan-500"
                       } disabled:cursor-not-allowed disabled:opacity-40`}
                     >
-                      {slot}
+                      {slot.startTime}
                     </button>
                   );
                 })}
               </div>
 
-              {selectedServices.length > 0 && selectedDate && availableSlots.length === 0 && (
+              {selectedServices.length > 0 &&
+                selectedDate &&
+                !isLoadingAvailability &&
+                !availabilityErrorMessage &&
+                availableSlots.length === 0 && (
                 <p className="mt-4 text-sm text-amber-400">
                   Nenhum horario vago encontrado para este dia.
                 </p>
-              )}
+                )}
             </div>
           </section>
 
@@ -199,7 +210,7 @@ const Home = () => {
                         key={service.id}
                         className="rounded-xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-slate-200"
                       >
-                        {service.name}
+                        {service.serviceType}
                       </div>
                     ))
                   ) : (
