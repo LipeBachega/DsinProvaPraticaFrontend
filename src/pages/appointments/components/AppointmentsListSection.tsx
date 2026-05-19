@@ -21,10 +21,28 @@ const AppointmentsListSection = ({
 }: AppointmentsListSectionProps) => {
   const navigate = useNavigate();
 
+  if (isLoading) {
+    return (
+      <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+        <p className="text-sm text-slate-400">Carregando agendamentos...</p>
+      </section>
+    );
+  }
+
+  if (errorMessage) {
+    return (
+      <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+        <p className="text-sm text-rose-300">{errorMessage}</p>
+      </section>
+    );
+  }
+
   return (
     <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
       <SectionTitle
-        title={isAdminView ? "Todos os agendamentos" : "Histórico de agendamentos"}
+        title={
+          isAdminView ? "Todos os agendamentos" : "Histórico de agendamentos"
+        }
         description={
           isAdminView
             ? "Resultados encontrados com base no período e nos filtros informados."
@@ -32,21 +50,11 @@ const AppointmentsListSection = ({
         }
       />
 
-      {isLoading && (
-        <p className="text-sm text-slate-400">Carregando agendamentos...</p>
-      )}
-
-      {!isLoading && errorMessage && (
-        <p className="text-sm text-rose-300">{errorMessage}</p>
-      )}
-
-      {!isLoading && !errorMessage && appointments.length === 0 && (
+      {appointments.length === 0 ? (
         <p className="text-sm text-slate-400">
           Nenhum agendamento foi encontrado para este filtro.
         </p>
-      )}
-
-      {!isLoading && !errorMessage && appointments.length > 0 && (
+      ) : (
         <div className="flex flex-col gap-4">
           {appointments.map((appointment) => (
             <AppointmentHistoryCard

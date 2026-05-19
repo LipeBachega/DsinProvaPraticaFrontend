@@ -5,17 +5,13 @@ interface HomeHeaderProps {
   onLogout: () => void;
 }
 
-const HomeHeader = ({
-  onViewAppointments,
-  onLogout,
-}: HomeHeaderProps) => {
+const HomeHeader = ({ onViewAppointments, onLogout }: HomeHeaderProps) => {
   return (
     // Cabeçalho isolado porque ele concentra navegação da home.
+    // TODO: colocar o cabeçalho em uma componente separado.
+    // TODO: criar cabeçalho personalizado para cliente e administrador.
     <header className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-900 px-6 py-5">
-      <SectionTitle
-        title="Cabeleleila Leila"
-        description="Novo agendamento"
-      />
+      <SectionTitle title="Cabeleleila Leila" description="Novo agendamento" />
 
       <div className="flex items-center gap-3">
         <button
