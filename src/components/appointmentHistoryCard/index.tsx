@@ -36,7 +36,7 @@ const AppointmentHistoryCard = ({
 
           {appointment.customer && (
             <p className="mt-2 text-sm text-slate-300">
-              {appointment.customer.name} • {appointment.customer.phone}
+              {appointment.customer.name} - {appointment.customer.phone}
             </p>
           )}
         </div>
