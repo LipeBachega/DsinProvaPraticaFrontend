@@ -1,9 +1,8 @@
-import { getToken } from "../../utils/auth-storage";
 import type {
   AppointmentStatus,
   IAppointmentDetail,
 } from "../../types/appointment.type";
-import type { IUserRole } from "../../types/customer.type";
+import { getCurrentUserRole } from "../../utils/auth";
 
 export type AppointmentFilter = "TODOS" | AppointmentStatus;
 
@@ -29,29 +28,7 @@ export const statusClassMap: Record<AppointmentStatus, string> = {
   CONCLUIDO: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
 };
 
-export function getCurrentUserRole(): IUserRole | null {
-  const token = getToken();
-
-  if (!token) {
-    return null;
-  }
-
-  try {
-    const [, payload] = token.split(".");
-
-    if (!payload) {
-      return null;
-    }
-
-    const normalizedPayload = payload.replace(/-/g, "+").replace(/_/g, "/");
-    const decodedPayload = atob(normalizedPayload);
-    const parsedPayload = JSON.parse(decodedPayload) as { role?: IUserRole };
-
-    return parsedPayload.role ?? null;
-  } catch {
-    return null;
-  }
-}
+export { getCurrentUserRole };
 
 export function getAppointmentTotal(appointment: IAppointmentDetail) {
   return appointment.services.reduce(

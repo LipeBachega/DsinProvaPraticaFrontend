@@ -1,12 +1,11 @@
 import { useState, type SyntheticEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import Button from "../../components/button";
 import Card from "../../components/card";
 import Input from "../../components/input";
-import Button from "../../components/button";
 import { useLogin } from "../../hooks/use-login";
 
 const Login = () => {
-  // O estado local guarda apenas os valores digitados; a chamada da API fica no hook.
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -19,21 +18,19 @@ const Login = () => {
   const handleLogin = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Se a API autenticar, seguimos para a home principal do sistema.
     const response = await submit({ email, password });
 
     if (response?.success) {
-      navigate("/home");
+      navigate("/home", { replace: true });
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
       <Card>
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white">Login</h1>
-
-          <p className="text-slate-400 mt-2">Entre para acessar o sistema</p>
+          <p className="mt-2 text-slate-400">Entre para acessar o sistema</p>
         </div>
 
         {successMessage && (
@@ -55,6 +52,8 @@ const Login = () => {
             placeholder="Digite seu e-mail"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
+            autoComplete="email"
+            required
           />
 
           <Input
@@ -63,6 +62,8 @@ const Login = () => {
             placeholder="Digite sua senha"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
+            autoComplete="current-password"
+            required
           />
 
           <Button

@@ -4,7 +4,7 @@ import type {
   IAppointmentDetail,
   IAppointmentResponseData,
 } from "../../types/appointment.type";
-import { getToken } from "../../utils/auth-storage";
+import { getCurrentUserRole } from "../../utils/auth";
 import { formatDateToInput } from "../../utils/date";
 
 export function getAppointmentTotal(appointment: IAppointmentDetail) {
@@ -48,29 +48,7 @@ export function canManageAppointment(appointment: IAppointmentDetail) {
   );
 }
 
-export function getCurrentUserRole(): IUserRole | null {
-  const token = getToken();
-
-  if (!token) {
-    return null;
-  }
-
-  try {
-    const [, payload] = token.split(".");
-
-    if (!payload) {
-      return null;
-    }
-
-    const normalizedPayload = payload.replace(/-/g, "+").replace(/_/g, "/");
-    const decodedPayload = atob(normalizedPayload);
-    const parsedPayload = JSON.parse(decodedPayload) as { role?: IUserRole };
-
-    return parsedPayload.role ?? null;
-  } catch {
-    return null;
-  }
-}
+export { getCurrentUserRole };
 
 export function getUpdatedAppointment(
   data?: IAppointmentResponseData | IAppointmentDetail,

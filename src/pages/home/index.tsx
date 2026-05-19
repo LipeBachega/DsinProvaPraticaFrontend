@@ -4,6 +4,7 @@ import { useAvailability } from "../../hooks/use-availability";
 import { useCreateAppointment } from "../../hooks/use-create-appointment";
 import { useServices } from "../../hooks/use-services";
 import { useWeeklyAppointmentWarning } from "../../hooks/use-weekly-appointment-warning";
+import { removeToken } from "../../utils/auth-storage";
 import { formatCurrency } from "../../utils/currency";
 import AppointmentSummary from "./components/AppointmentSummary";
 import AvailabilitySection from "./components/AvailabilitySection";
@@ -14,7 +15,6 @@ import ServiceSelection from "./components/ServiceSelection";
 const Home = () => {
   const navigate = useNavigate();
 
-  // Os hooks abaixo representam cada fonte de dados/ação da home.
   const {
     services,
     isLoading: isLoadingServices,
@@ -51,7 +51,6 @@ const Home = () => {
     selectedServices.includes(service.id),
   );
 
-  // Esses totais alimentam o resumo lateral em tempo real.
   const totalDuration = useMemo(() => {
     return selectedServiceDetails.reduce(
       (total, service) => total + service.estimatedTimeInMinutes,
@@ -67,7 +66,6 @@ const Home = () => {
   }, [selectedServiceDetails]);
 
   const toggleService = (serviceId: number) => {
-    // Ao trocar serviço, limpamos o horário porque a disponibilidade muda.
     setSelectedTime("");
 
     setSelectedServices((current) =>
@@ -78,14 +76,12 @@ const Home = () => {
   };
 
   const handleDateChange = (date: string) => {
-    // Trocar a data invalida o horário anterior e mensagens dependentes da escolha.
     setSelectedDate(date);
     setSelectedTime("");
     clearMessages();
   };
 
   const handleCreateAppointment = async () => {
-    // O backend espera o startDate completo com timezone, então usamos o slot retornado pela API.
     const selectedSlot = availableSlots.find(
       (slot) => slot.startTime === selectedTime,
     );
@@ -100,13 +96,11 @@ const Home = () => {
     });
 
     if (response?.success) {
-      // Após sucesso, limpamos a seleção do horário e recarregamos os slots da data.
       setSelectedTime("");
       refetchAvailability();
     }
   };
 
-  // O texto da seção de horários muda conforme o usuário avança no fluxo.
   const availabilityDescription =
     selectedServices.length === 0
       ? "Escolha ao menos um servico para liberar a busca de horarios."
@@ -115,11 +109,14 @@ const Home = () => {
         : "Escolha um horario livre para finalizar o agendamento.";
 
   return (
-    <div className="min-h-screen bg-slate-950 px-6 py-10 text-white select-none">
+    <div className="min-h-screen select-none bg-slate-950 px-6 py-10 text-white">
       <div className="mx-auto flex max-w-5xl flex-col gap-8">
         <HomeHeader
           onViewAppointments={() => navigate("/appointments")}
-          onLogout={() => navigate("/login")}
+          onLogout={() => {
+            removeToken();
+            navigate("/login", { replace: true });
+          }}
         />
 
         <div className="grid grid-cols-[1.4fr_0.8fr] gap-6">
