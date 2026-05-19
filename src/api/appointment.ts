@@ -61,7 +61,22 @@ export async function createAppointmentRequest(
     body: JSON.stringify(payload),
   });
 
-  const data = (await response.json()) as IResponse<IAppointmentResponseData>;
+  const responseText = await response.text();
+  let data: IResponse<IAppointmentResponseData> = {
+    status: response.status,
+    success: false,
+    message: "",
+  };
+
+  if (responseText) {
+    try {
+      data = JSON.parse(responseText) as IResponse<IAppointmentResponseData>;
+    } catch {
+      throw new ApiRequestError(
+        "A API retornou uma resposta invalida ao atualizar o agendamento.",
+      );
+    }
+  }
 
   if (!response.ok || !data.success) {
     throw new ApiRequestError(

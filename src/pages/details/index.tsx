@@ -11,8 +11,13 @@ import SectionTitle from "../../components/sectionTitle";
 import SummaryCard from "../../components/summaryCard";
 import TimeSlotButton from "../../components/timeSlotButton.tsx";
 import { useAvailability } from "../../hooks/use-availability";
-import type { IAppointmentDetail } from "../../types/appointment.type";
+import type { IUserRole } from "../../types/customer.type";
+import type {
+  IAppointmentDetail,
+  IAppointmentResponseData,
+} from "../../types/appointment.type";
 import { formatCurrency } from "../../utils/currency";
+import { getToken } from "../../utils/auth-storage";
 import {
   formatDateTime,
   formatDateToInput,
@@ -33,16 +38,62 @@ function getTotalDuration(appointment: IAppointmentDetail) {
   );
 }
 
-function getMinimumRescheduleDate() {
-  const date = new Date();
-  date.setDate(date.getDate() + 2);
-  return formatDateToInput(date);
+function getTodayInput() {
+  return formatDateToInput(new Date());
+}
+
+function canChangeAppointmentThroughSystem(date: string | Date) {
+  const diffInMs = new Date(date).getTime() - new Date().getTime();
+  const twoDaysInMs = 1000 * 60 * 60 * 24 * 2;
+  return diffInMs >= twoDaysInMs;
 }
 
 function canManageAppointment(appointment: IAppointmentDetail) {
   return (
     appointment.status !== "CANCELADO" && appointment.status !== "CONCLUIDO"
   );
+}
+
+function getCurrentUserRole(): IUserRole | null {
+  const token = getToken();
+
+  if (!token) {
+    return null;
+  }
+
+  try {
+    const [, payload] = token.split(".");
+
+    if (!payload) {
+      return null;
+    }
+
+    const normalizedPayload = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const decodedPayload = atob(normalizedPayload);
+    const parsedPayload = JSON.parse(decodedPayload) as { role?: IUserRole };
+
+    return parsedPayload.role ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function getUpdatedAppointment(
+  data?: IAppointmentResponseData | IAppointmentDetail,
+) {
+  if (!data) {
+    return undefined;
+  }
+
+  if ("appointment" in data && data.appointment) {
+    return data.appointment;
+  }
+
+  if ("id" in data) {
+    return data;
+  }
+
+  return undefined;
 }
 
 const AppointmentDetails = () => {
@@ -68,12 +119,14 @@ const AppointmentDetails = () => {
     refetch: refetchAvailability,
   } = useAvailability(selectedDate, serviceIds);
 
-  const minimumRescheduleDate = getMinimumRescheduleDate();
+  const todayInput = getTodayInput();
+  const currentUserRole = getCurrentUserRole();
+  const isCustomerView = currentUserRole !== "ADMIN";
 
   useEffect(() => {
     async function loadAppointment() {
       if (!appointmentId) {
-        setErrorMessage("Agendamento não encontrado.");
+        setErrorMessage("Agendamento nao encontrado.");
         setIsLoading(false);
         return;
       }
@@ -87,8 +140,10 @@ const AppointmentDetails = () => {
       } catch (error) {
         if (error instanceof ApiRequestError) {
           setErrorMessage(error.message);
+        } else if (error instanceof Error) {
+          setErrorMessage(error.message);
         } else {
-          setErrorMessage("Não foi possível carregar os detalhes do agendamento.");
+          setErrorMessage("Nao foi possivel carregar os detalhes do agendamento.");
         }
       } finally {
         setIsLoading(false);
@@ -103,8 +158,8 @@ const AppointmentDetails = () => {
       return false;
     }
 
-    return formatDateToInput(new Date(appointment.startDate)) >= minimumRescheduleDate;
-  }, [appointment, minimumRescheduleDate]);
+    return canChangeAppointmentThroughSystem(appointment.startDate);
+  }, [appointment]);
 
   const selectedSlot = useMemo(() => {
     return availableSlots.find((slot) => slot.startTime === selectedTime) ?? null;
@@ -131,8 +186,10 @@ const AppointmentDetails = () => {
     } catch (error) {
       if (error instanceof ApiRequestError) {
         setErrorMessage(error.message);
+      } else if (error instanceof Error) {
+        setErrorMessage(error.message);
       } else {
-        setErrorMessage("Não foi possível cancelar o agendamento.");
+        setErrorMessage("Nao foi possivel cancelar o agendamento.");
       }
     } finally {
       setIsCancelling(false);
@@ -154,20 +211,24 @@ const AppointmentDetails = () => {
         serviceIds,
       });
 
-      if (!response.data?.appointment) {
-        setErrorMessage("Não foi possível carregar o agendamento atualizado.");
+      const updatedAppointment = getUpdatedAppointment(response.data);
+
+      if (!updatedAppointment) {
+        setErrorMessage("Nao foi possivel carregar o agendamento atualizado.");
         return;
       }
 
-      setAppointment(response.data.appointment);
+      setAppointment(updatedAppointment);
       setSelectedTime("");
       refetchAvailability();
       setActionMessage(response.message || "Agendamento reagendado com sucesso.");
     } catch (error) {
       if (error instanceof ApiRequestError) {
         setErrorMessage(error.message);
+      } else if (error instanceof Error) {
+        setErrorMessage(error.message);
       } else {
-        setErrorMessage("Não foi possível reagendar o agendamento.");
+        setErrorMessage("Nao foi possivel reagendar o agendamento.");
       }
     } finally {
       setIsRescheduling(false);
@@ -288,14 +349,24 @@ const AppointmentDetails = () => {
                   </p>
                 )}
 
-                <button
-                  type="button"
-                  onClick={handleCancelAppointment}
-                  disabled={!canManageAppointment(appointment) || isCancelling}
-                  className="h-12 w-full rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 text-sm font-semibold text-rose-200 transition hover:bg-rose-500/20 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {isCancelling ? "Cancelando..." : "Cancelar agendamento"}
-                </button>
+                {!isCustomerView && (
+                  <button
+                    type="button"
+                    onClick={handleCancelAppointment}
+                    disabled={!canManageAppointment(appointment) || isCancelling}
+                    className="h-12 w-full rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 text-sm font-semibold text-rose-200 transition hover:bg-rose-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isCancelling ? "Cancelando..." : "Cancelar agendamento"}
+                  </button>
+                )}
+
+                {isCustomerView && (
+                  <div className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-4 text-sm text-amber-200">
+                    Cancelamentos so podem ser feitos por telefone. Alteracoes de
+                    data com menos de 2 dias de antecedencia tambem devem ser
+                    solicitadas por telefone.
+                  </div>
+                )}
 
                 {!canManageAppointment(appointment) && (
                   <p className="mt-4 text-sm text-slate-400">
@@ -321,7 +392,7 @@ const AppointmentDetails = () => {
                     <input
                       type="date"
                       value={selectedDate}
-                      min={minimumRescheduleDate}
+                      min={todayInput}
                       onChange={(event) => {
                         setSelectedDate(event.target.value);
                         setSelectedTime("");
