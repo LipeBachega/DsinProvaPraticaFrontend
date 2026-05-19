@@ -7,6 +7,7 @@ import TimeSlotButton from "../../components/timeSlotButton.tsx";
 import { useAvailability } from "../../hooks/use-availability";
 import { useCreateAppointment } from "../../hooks/use-create-appointment";
 import { useServices } from "../../hooks/use-services";
+import { useWeeklyAppointmentWarning } from "../../hooks/use-weekly-appointment-warning";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -24,6 +25,11 @@ const Home = () => {
     errorMessage: availabilityErrorMessage,
     refetch: refetchAvailability,
   } = useAvailability(selectedDate, selectedServices);
+  const {
+    hasWeeklyAppointment,
+    warningMessage: weeklyAppointmentWarningMessage,
+    errorMessage: weeklyAppointmentWarningError,
+  } = useWeeklyAppointmentWarning(selectedDate, selectedServices);
   const {
     isLoading: isCreatingAppointment,
     errorMessage: createAppointmentErrorMessage,
@@ -192,6 +198,23 @@ const Home = () => {
                   {availabilityErrorMessage}
                 </p>
               )}
+
+              {!isLoadingAvailability &&
+                !availabilityErrorMessage &&
+                hasWeeklyAppointment &&
+                weeklyAppointmentWarningMessage && (
+                  <div className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+                    {weeklyAppointmentWarningMessage}
+                  </div>
+                )}
+
+              {!isLoadingAvailability &&
+                !availabilityErrorMessage &&
+                weeklyAppointmentWarningError && (
+                  <p className="mt-4 text-sm text-rose-300">
+                    {weeklyAppointmentWarningError}
+                  </p>
+                )}
 
               <div className="mt-4 flex flex-wrap gap-3">
                 {availableSlots.map((slot) => (

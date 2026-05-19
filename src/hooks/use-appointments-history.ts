@@ -5,10 +5,7 @@ import type {
   IAppointmentDetail,
   IAppointmentHistoryQuery,
 } from "../types/appointment.type";
-
-function formatDate(date: Date) {
-  return date.toISOString().split("T")[0];
-}
+import { formatDateToInput } from "../utils/date";
 
 function getDefaultPeriod(): IAppointmentHistoryQuery {
   const now = new Date();
@@ -16,8 +13,8 @@ function getDefaultPeriod(): IAppointmentHistoryQuery {
   const endDate = new Date(now.getFullYear() + 1, 11, 31);
 
   return {
-    startDate: formatDate(startDate),
-    endDate: formatDate(endDate),
+    startDate: formatDateToInput(startDate),
+    endDate: formatDateToInput(endDate),
   };
 }
 
