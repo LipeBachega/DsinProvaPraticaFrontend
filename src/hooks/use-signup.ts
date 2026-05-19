@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { ApiRequestError, signUpRequest } from "../api/auth";
+import { signUpRequest } from "../api/customer";
+import { ApiRequestError } from "../api/shared";
 import type { ICustomerCreate } from "../types/customer.type";
-import type { IValidationError } from "../types/validation.type";
-
-type ApiFieldError = NonNullable<IValidationError["fields"]>[number];
+import type { ApiFieldError } from "../api/shared";
 
 function mapFieldErrors(details?: string | ApiFieldError[]) {
   if (!Array.isArray(details)) {

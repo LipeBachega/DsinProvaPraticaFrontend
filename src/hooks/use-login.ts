@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ApiRequestError, loginRequest } from "../api/auth";
+import { loginRequest } from "../api/login";
+import { ApiRequestError } from "../api/shared";
 import { saveToken } from "../utils/auth-storage";
 import type { ILogin } from "../types/auth.type";
 
