@@ -77,7 +77,10 @@ export async function getAppointmentHistoryRequest(
   query: IAppointmentHistoryQuery,
 ) {
   // O histórico é filtrado por período para alimentar a página "Meus agendamentos".
-  const params = new URLSearchParams();
+  const params = new URLSearchParams({
+    startDate: query.startDate,
+    endDate: query.endDate,
+  });
 
   const response = await fetch(`${API_URL}/appointments/history?${params}`, {
     headers: createAuthHeaders(),
@@ -101,7 +104,7 @@ export async function getAppointmentDetailRequest(id: number) {
     headers: createAuthHeaders(),
   });
 
-  const data = (await response.json()) as IResponse;
+  const data = (await response.json()) as IResponse<IAppointmentDetail>;
 
   if (!response.ok || !data.success) {
     throw new ApiRequestError(

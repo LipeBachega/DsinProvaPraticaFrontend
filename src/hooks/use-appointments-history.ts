@@ -27,6 +27,13 @@ export function useAppointmentsHistory() {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
+    if (period.startDate > period.endDate) {
+      setAppointments([]);
+      setIsLoading(false);
+      setErrorMessage("A data inicial nao pode ser maior que a data final.");
+      return;
+    }
+
     async function loadHistory() {
       // Cada mudança no período dispara uma nova leitura no backend.
       setIsLoading(true);

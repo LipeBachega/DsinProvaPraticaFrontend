@@ -7,6 +7,7 @@ interface AppointmentHistoryCardProps {
   formatHour: (value: string | Date) => string;
   formatPrice: (value: number) => string;
   getAppointmentTotal: (appointment: IAppointmentDetail) => number;
+  onViewDetails?: () => void;
 }
 
 const AppointmentHistoryCard = ({
@@ -16,6 +17,7 @@ const AppointmentHistoryCard = ({
   formatHour,
   formatPrice,
   getAppointmentTotal,
+  onViewDetails,
 }: AppointmentHistoryCardProps) => {
   return (
     <article className="rounded-2xl border border-slate-800 bg-slate-950 p-5">
@@ -63,6 +65,18 @@ const AppointmentHistoryCard = ({
           <p className="mt-1 text-sm text-white">{appointment.status}</p>
         </div>
       </div>
+
+      {onViewDetails && (
+        <div className="mt-4 flex justify-end">
+          <button
+            type="button"
+            onClick={onViewDetails}
+            className="rounded-xl border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-cyan-500 hover:text-cyan-400"
+          >
+            Ver detalhes
+          </button>
+        </div>
+      )}
     </article>
   );
 };

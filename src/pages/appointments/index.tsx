@@ -53,14 +53,22 @@ const Appointments = () => {
 
   const filteredAppointments = useMemo(() => {
     // O filtro atua apenas sobre os dados já carregados, sem nova ida ao backend.
+    const sortedAppointments = [...appointments].sort((first, second) => {
+      return (
+        new Date(second.startDate).getTime() - new Date(first.startDate).getTime()
+      );
+    });
+
     if (activeFilter === "TODOS") {
-      return appointments;
+      return sortedAppointments;
     }
 
-    return appointments.filter(
+    return sortedAppointments.filter(
       (appointment) => appointment.status === activeFilter,
     );
   }, [activeFilter, appointments]);
+
+  const isPeriodInvalid = period.startDate > period.endDate;
 
   const counters = useMemo(() => {
     // Esses contadores alimentam o painel-resumo por status logo no topo da página.
@@ -142,6 +150,7 @@ const Appointments = () => {
                 type="date"
                 value={period.startDate}
                 onChange={handlePeriodChange("startDate")}
+                max={period.endDate}
                 className="h-12 w-52 rounded-xl border border-slate-700 bg-slate-950 px-4 text-white outline-none transition focus:border-cyan-500"
               />
             </div>
@@ -152,10 +161,17 @@ const Appointments = () => {
                 type="date"
                 value={period.endDate}
                 onChange={handlePeriodChange("endDate")}
+                min={period.startDate}
                 className="h-12 w-52 rounded-xl border border-slate-700 bg-slate-950 px-4 text-white outline-none transition focus:border-cyan-500"
               />
             </div>
           </div>
+
+          {isPeriodInvalid && (
+            <p className="mt-3 text-sm text-amber-300">
+              A data inicial nao pode ser maior que a data final.
+            </p>
+          )}
 
           <div className="mt-6 flex flex-wrap gap-3">
             {/* Os botões abaixo não pedem nova busca; só filtram visualmente a lista atual. */}
@@ -221,6 +237,9 @@ const Appointments = () => {
                   formatHour={formatHour}
                   formatPrice={formatCurrency}
                   getAppointmentTotal={getAppointmentTotal}
+                  onViewDetails={() =>
+                    navigate(`/appointments/${appointment.id}/detalhes`)
+                  }
                 />
               ))}
             </div>
