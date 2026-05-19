@@ -4,14 +4,16 @@ import Card from "../../components/card";
 import Input from "../../components/input";
 import Button from "../../components/button";
 
-const Login = () => {
+const SignUp = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
 
-  const handleLogin = () => {
+  const handleSignUp = () => {
     console.log({
+      name,
       email,
       password,
     });
@@ -21,12 +23,22 @@ const Login = () => {
     <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
       <Card>
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white">Login</h1>
+          <h1 className="text-3xl font-bold text-white">Criar conta</h1>
 
-          <p className="text-slate-400 mt-2">Entre para acessar o sistema</p>
+          <p className="text-slate-400 mt-2">
+            Cadastre-se para acessar o sistema
+          </p>
         </div>
 
-        <form onSubmit={handleLogin} className="flex flex-col gap-5">
+        <form onSubmit={handleSignUp} className="flex flex-col gap-5">
+          <Input
+            label="Nome"
+            type="text"
+            placeholder="Digite seu nome"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
+
           <Input
             label="E-mail"
             type="email"
@@ -43,12 +55,12 @@ const Login = () => {
             onChange={(event) => setPassword(event.target.value)}
           />
 
-          <Button type="submit" title="Entrar" />
+          <Button type="submit" title="Criar conta" />
 
           <Button
             type="button"
-            title="Cadastrar"
-            onClick={() => navigate("/signup")}
+            title="Voltar"
+            onClick={() => navigate("/login")}
           />
         </form>
       </Card>
@@ -56,4 +68,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignUp;
