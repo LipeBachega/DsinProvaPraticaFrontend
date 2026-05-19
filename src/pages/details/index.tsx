@@ -117,7 +117,7 @@ const AppointmentDetails = () => {
     isLoading: isLoadingAvailability,
     errorMessage: availabilityErrorMessage,
     refetch: refetchAvailability,
-  } = useAvailability(selectedDate, serviceIds);
+  } = useAvailability(selectedDate, serviceIds, appointment?.id);
 
   const todayInput = getTodayInput();
   const currentUserRole = getCurrentUserRole();

@@ -26,10 +26,13 @@ export async function getAvailabilityRequest(
   query: IAppointmentAvailabilityQuery,
 ) {
   // A disponibilidade depende da data escolhida e da combinação de serviços.
-  const params = new URLSearchParams({
-    date: query.date,
-    serviceIds: query.serviceIds.join(","),
-  });
+  const params = new URLSearchParams();
+  params.set("date", query.date);
+  params.set("serviceIds", query.serviceIds.join(","));
+
+  if (query.appointmentId) {
+    params.set("appointmentId", String(query.appointmentId));
+  }
 
   const response = await fetch(
     `${API_URL}/appointments/availability?${params}`,
