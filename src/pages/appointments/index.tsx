@@ -5,13 +5,14 @@ import SectionTitle from "../../components/sectionTitle";
 import SummaryCard from "../../components/summaryCard";
 import { useAppointmentsHistory } from "../../hooks/use-appointments-history";
 import { formatCurrency } from "../../utils/currency";
+import { getToken } from "../../utils/auth-storage";
 import { formatDateTime, formatHour } from "../../utils/date";
 import type {
   AppointmentStatus,
   IAppointmentDetail,
 } from "../../types/appointment.type";
+import type { IUserRole } from "../../types/customer.type";
 
-// O filtro "TODOS" é uma convenção visual da tela; os demais valores vêm do domínio.
 type AppointmentFilter = "TODOS" | AppointmentStatus;
 
 const statusLabelMap: Record<AppointmentStatus, string> = {
@@ -28,15 +29,37 @@ const statusClassMap: Record<AppointmentStatus, string> = {
   CONCLUIDO: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
 };
 
+function getCurrentUserRole(): IUserRole | null {
+  const token = getToken();
+
+  if (!token) {
+    return null;
+  }
+
+  try {
+    const [, payload] = token.split(".");
+
+    if (!payload) {
+      return null;
+    }
+
+    const normalizedPayload = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const decodedPayload = atob(normalizedPayload);
+    const parsedPayload = JSON.parse(decodedPayload) as { role?: IUserRole };
+
+    return parsedPayload.role ?? null;
+  } catch {
+    return null;
+  }
+}
+
 function getAppointmentTotal(appointment: IAppointmentDetail) {
-  // O backend devolve os serviços do agendamento; aqui somamos para exibir o valor final.
   return appointment.services.reduce(
     (total, service) => total + service.price,
     0,
   );
 }
 
-// Aqui contamos os agendamentos por status.
 function getStatusCount(
   appointments: IAppointmentDetail[],
   status: AppointmentStatus,
@@ -50,9 +73,9 @@ const Appointments = () => {
   const { period, setPeriod, appointments, isLoading, errorMessage } =
     useAppointmentsHistory();
   const [activeFilter, setActiveFilter] = useState<AppointmentFilter>("TODOS");
+  const isAdminView = getCurrentUserRole() === "ADMIN";
 
   const filteredAppointments = useMemo(() => {
-    // O filtro atua apenas sobre os dados já carregados, sem nova ida ao backend.
     const sortedAppointments = [...appointments].sort((first, second) => {
       return (
         new Date(second.startDate).getTime() - new Date(first.startDate).getTime()
@@ -71,7 +94,6 @@ const Appointments = () => {
   const isPeriodInvalid = period.startDate > period.endDate;
 
   const counters = useMemo(() => {
-    // Esses contadores alimentam o painel-resumo por status logo no topo da página.
     return {
       total: appointments.length,
       pendentes: getStatusCount(appointments, "PENDENTE"),
@@ -82,9 +104,8 @@ const Appointments = () => {
   }, [appointments]);
 
   const handlePeriodChange =
-    (field: "startDate" | "endDate") =>
+    (field: "startDate" | "endDate" | "search") =>
     (event: ChangeEvent<HTMLInputElement>) => {
-      // Mudanças de período disparam nova busca no hook de histórico.
       setPeriod((current) => ({
         ...current,
         [field]: event.target.value,
@@ -96,8 +117,12 @@ const Appointments = () => {
       <div className="mx-auto flex max-w-6xl flex-col gap-8">
         <header className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-900 px-6 py-5">
           <SectionTitle
-            title="Meus agendamentos"
-            description="Acompanhe todos os horarios do cliente por status."
+            title={isAdminView ? "Agenda administrativa" : "Meus agendamentos"}
+            description={
+              isAdminView
+                ? "Visualize todos os agendamentos e encontre clientes por nome ou telefone."
+                : "Acompanhe todos os horarios do cliente por status."
+            }
           />
 
           <button
@@ -111,9 +136,7 @@ const Appointments = () => {
 
         <div className="grid grid-cols-5 gap-4">
           <SummaryCard title="Todos">
-            <p className="text-3xl font-semibold text-white">
-              {counters.total}
-            </p>
+            <p className="text-3xl font-semibold text-white">{counters.total}</p>
           </SummaryCard>
           <SummaryCard title="Pendentes">
             <p className="text-3xl font-semibold text-white">
@@ -140,7 +163,11 @@ const Appointments = () => {
         <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
           <SectionTitle
             title="Filtros"
-            description="Escolha o periodo e o status que deseja visualizar."
+            description={
+              isAdminView
+                ? "Escolha o periodo, o status e filtre clientes por nome ou telefone."
+                : "Escolha o periodo e o status que deseja visualizar."
+            }
           />
 
           <div className="flex items-end gap-4">
@@ -165,6 +192,21 @@ const Appointments = () => {
                 className="h-12 w-52 rounded-xl border border-slate-700 bg-slate-950 px-4 text-white outline-none transition focus:border-cyan-500"
               />
             </div>
+
+            {isAdminView && (
+              <div className="flex flex-1 flex-col gap-2">
+                <label className="text-sm text-slate-300">
+                  Cliente ou telefone
+                </label>
+                <input
+                  type="text"
+                  value={period.search ?? ""}
+                  onChange={handlePeriodChange("search")}
+                  placeholder="Ex.: teste2 ou 14999990002"
+                  className="h-12 rounded-xl border border-slate-700 bg-slate-950 px-4 text-white outline-none transition focus:border-cyan-500"
+                />
+              </div>
+            )}
           </div>
 
           {isPeriodInvalid && (
@@ -174,7 +216,6 @@ const Appointments = () => {
           )}
 
           <div className="mt-6 flex flex-wrap gap-3">
-            {/* Os botões abaixo não pedem nova busca; só filtram visualmente a lista atual. */}
             {(
               [
                 "TODOS",
@@ -208,8 +249,12 @@ const Appointments = () => {
 
         <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
           <SectionTitle
-            title="Historico do cliente"
-            description="Todos os agendamentos encontrados no periodo selecionado."
+            title={isAdminView ? "Todos os agendamentos" : "Historico do cliente"}
+            description={
+              isAdminView
+                ? "Resultados encontrados para o periodo e filtros informados."
+                : "Todos os agendamentos encontrados no periodo selecionado."
+            }
           />
 
           {isLoading && (

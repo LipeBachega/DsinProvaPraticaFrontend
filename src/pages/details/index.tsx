@@ -48,6 +48,17 @@ function canChangeAppointmentThroughSystem(date: string | Date) {
   return diffInMs >= twoDaysInMs;
 }
 
+function canUserRescheduleAppointment(
+  role: IUserRole | null,
+  appointment: IAppointmentDetail,
+) {
+  if (role === "ADMIN") {
+    return true;
+  }
+
+  return canChangeAppointmentThroughSystem(appointment.startDate);
+}
+
 function canManageAppointment(appointment: IAppointmentDetail) {
   return (
     appointment.status !== "CANCELADO" && appointment.status !== "CONCLUIDO"
@@ -158,8 +169,8 @@ const AppointmentDetails = () => {
       return false;
     }
 
-    return canChangeAppointmentThroughSystem(appointment.startDate);
-  }, [appointment]);
+    return canUserRescheduleAppointment(currentUserRole, appointment);
+  }, [appointment, currentUserRole]);
 
   const selectedSlot = useMemo(() => {
     return availableSlots.find((slot) => slot.startTime === selectedTime) ?? null;
@@ -291,6 +302,28 @@ const AppointmentDetails = () => {
                 </p>
               </SummaryCard>
             </div>
+
+            {!isCustomerView && appointment.customer && (
+              <div className="grid grid-cols-3 gap-4">
+                <SummaryCard title="Cliente">
+                  <p className="text-lg font-semibold text-white">
+                    {appointment.customer.name}
+                  </p>
+                </SummaryCard>
+
+                <SummaryCard title="Telefone">
+                  <p className="text-lg font-semibold text-white">
+                    {appointment.customer.phone}
+                  </p>
+                </SummaryCard>
+
+                <SummaryCard title="E-mail">
+                  <p className="text-sm font-semibold text-white">
+                    {appointment.customer.email}
+                  </p>
+                </SummaryCard>
+              </div>
+            )}
 
             <div className="grid grid-cols-[1.1fr_0.9fr] gap-6">
               <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">

@@ -100,6 +100,10 @@ export async function getAppointmentHistoryRequest(
     endDate: query.endDate,
   });
 
+  if (query.search?.trim()) {
+    params.set("search", query.search.trim());
+  }
+
   const response = await fetch(`${API_URL}/appointments/history?${params}`, {
     headers: createAuthHeaders(),
   });

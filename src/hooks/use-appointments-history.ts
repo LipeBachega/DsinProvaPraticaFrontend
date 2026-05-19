@@ -16,6 +16,7 @@ function getDefaultPeriod(): IAppointmentHistoryQuery {
   return {
     startDate: formatDateToInput(startDate),
     endDate: formatDateToInput(endDate),
+    search: "",
   };
 }
 

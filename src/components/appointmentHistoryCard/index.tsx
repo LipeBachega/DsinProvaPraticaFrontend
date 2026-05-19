@@ -33,6 +33,12 @@ const AppointmentHistoryCard = ({
             {formatDateTime(appointment.startDate)} ate{" "}
             {formatHour(appointment.endDate)}
           </p>
+
+          {appointment.customer && (
+            <p className="mt-2 text-sm text-slate-300">
+              {appointment.customer.name} • {appointment.customer.phone}
+            </p>
+          )}
         </div>
 
         <span
