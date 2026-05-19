@@ -5,19 +5,19 @@ const services = [
   {
     id: 1,
     name: "Corte de Cabelo",
-    price: "R$ 50",
+    price: 50,
     duration: 60,
   },
   {
     id: 2,
     name: "Manicure",
-    price: "R$ 35",
+    price: 35,
     duration: 45,
   },
   {
     id: 3,
     name: "Pintura",
-    price: "R$ 120",
+    price: 120,
     duration: 120,
   },
 ];
@@ -40,8 +40,19 @@ const Home = () => {
     selectedServices.includes(service.id),
   );
 
+  const formatPrice = (value: number) => {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(value);
+  };
+
   const totalDuration = useMemo(() => {
     return selectedServiceDetails.reduce((total, service) => total + service.duration, 0);
+  }, [selectedServiceDetails]);
+
+  const totalPrice = useMemo(() => {
+    return selectedServiceDetails.reduce((total, service) => total + service.price, 0);
   }, [selectedServiceDetails]);
 
   const toggleService = (serviceId: number) => {
@@ -110,7 +121,7 @@ const Home = () => {
                       </div>
 
                       <span className="text-base font-semibold text-cyan-400">
-                        {service.price}
+                        {formatPrice(service.price)}
                       </span>
                     </div>
                   </button>
@@ -201,6 +212,13 @@ const Home = () => {
                 <p className="text-sm text-slate-400">Duracao total</p>
                 <strong className="mt-1 block text-lg text-white">
                   {totalDuration > 0 ? `${totalDuration} minutos` : "--"}
+                </strong>
+              </div>
+
+              <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
+                <p className="text-sm text-slate-400">Valor total</p>
+                <strong className="mt-1 block text-lg text-white">
+                  {totalPrice > 0 ? formatPrice(totalPrice) : "--"}
                 </strong>
               </div>
 
