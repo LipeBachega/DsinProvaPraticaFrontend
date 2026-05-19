@@ -1,18 +1,28 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, type SyntheticEvent } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Card from "../../components/card";
 import Input from "../../components/input";
 import Button from "../../components/button";
+import { useLogin } from "../../hooks/use-login";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isLoading, errorMessage, submit } = useLogin();
 
-  const handleLogin = () => {
-    console.log({ email, password });
-    navigate("/home");
+  const successMessage = location.state?.successMessage as string | undefined;
+
+  const handleLogin = async (event: SyntheticEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const response = await submit({ email, password });
+
+    if (response?.success) {
+      navigate("/home");
+    }
   };
 
   return (
@@ -23,6 +33,18 @@ const Login = () => {
 
           <p className="text-slate-400 mt-2">Entre para acessar o sistema</p>
         </div>
+
+        {successMessage && (
+          <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
+            {successMessage}
+          </div>
+        )}
+
+        {errorMessage && (
+          <div className="mb-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">
+            {errorMessage}
+          </div>
+        )}
 
         <form onSubmit={handleLogin} className="flex flex-col gap-5">
           <Input
@@ -41,11 +63,12 @@ const Login = () => {
             onChange={(event) => setPassword(event.target.value)}
           />
 
-          <Button type="submit" title="Entrar" />
+          <Button type="submit" title={isLoading ? "Entrando..." : "Entrar"} disabled={isLoading} />
 
           <Button
             type="button"
             title="Cadastrar"
+            disabled={isLoading}
             onClick={() => navigate("/signup")}
           />
         </form>
