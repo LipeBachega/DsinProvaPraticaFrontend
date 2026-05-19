@@ -4,12 +4,14 @@ import { ApiRequestError } from "../api/shared";
 import type { IAppointmentCreateInput } from "../types/appointment.type";
 
 export function useCreateAppointment() {
+  // Centraliza o estado do envio final do agendamento.
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [suggestionMessage, setSuggestionMessage] = useState("");
 
   const submit = async (payload: IAppointmentCreateInput) => {
+    // Sempre começamos uma tentativa limpando mensagens de tentativas anteriores.
     setIsLoading(true);
     setErrorMessage("");
     setSuccessMessage("");
@@ -18,6 +20,7 @@ export function useCreateAppointment() {
     try {
       const response = await createAppointmentRequest(payload);
 
+      // A resposta de sucesso pode trazer mensagem principal e uma sugestão extra do backend.
       setSuccessMessage(response.message);
       setSuggestionMessage(response.data?.suggestion?.message ?? "");
 
@@ -36,6 +39,7 @@ export function useCreateAppointment() {
   };
 
   const clearMessages = () => {
+    // A home usa isso sempre que o usuário altera decisões importantes do fluxo.
     setErrorMessage("");
     setSuccessMessage("");
     setSuggestionMessage("");

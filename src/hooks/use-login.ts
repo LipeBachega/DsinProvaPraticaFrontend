@@ -5,10 +5,12 @@ import { saveToken } from "../utils/auth-storage";
 import type { ILogin } from "../types/auth.type";
 
 export function useLogin() {
+  // Este hook isola todo o ciclo do login: loading, erro e persistência do token.
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const submit = async (payload: ILogin) => {
+    // A cada nova tentativa limpamos o erro anterior para não confundir o usuário.
     setIsLoading(true);
     setErrorMessage("");
 
@@ -17,6 +19,7 @@ export function useLogin() {
       const token = response.data?.token;
 
       if (token) {
+        // O token fica salvo para ser usado nas requests autenticadas seguintes.
         saveToken(token);
       }
 
@@ -30,6 +33,7 @@ export function useLogin() {
 
       return null;
     } finally {
+      // O loading sempre precisa ser encerrado, com sucesso ou erro.
       setIsLoading(false);
     }
   };

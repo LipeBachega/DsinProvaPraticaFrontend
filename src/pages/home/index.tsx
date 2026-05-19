@@ -14,6 +14,7 @@ import ServiceSelection from "./components/ServiceSelection";
 const Home = () => {
   const navigate = useNavigate();
 
+  // Os hooks abaixo representam cada fonte de dados/ação da home.
   const {
     services,
     isLoading: isLoadingServices,
@@ -21,9 +22,7 @@ const Home = () => {
   } = useServices();
 
   const [selectedServices, setSelectedServices] = useState<number[]>([]);
-
   const [selectedDate, setSelectedDate] = useState("");
-
   const [selectedTime, setSelectedTime] = useState("");
 
   const {
@@ -52,6 +51,7 @@ const Home = () => {
     selectedServices.includes(service.id),
   );
 
+  // Esses totais alimentam o resumo lateral em tempo real.
   const totalDuration = useMemo(() => {
     return selectedServiceDetails.reduce(
       (total, service) => total + service.estimatedTimeInMinutes,
@@ -67,6 +67,7 @@ const Home = () => {
   }, [selectedServiceDetails]);
 
   const toggleService = (serviceId: number) => {
+    // Ao trocar serviço, limpamos o horário porque a disponibilidade muda.
     setSelectedTime("");
 
     setSelectedServices((current) =>
@@ -77,12 +78,14 @@ const Home = () => {
   };
 
   const handleDateChange = (date: string) => {
+    // Trocar a data invalida o horário anterior e mensagens dependentes da escolha.
     setSelectedDate(date);
     setSelectedTime("");
     clearMessages();
   };
 
   const handleCreateAppointment = async () => {
+    // O backend espera o startDate completo com timezone, então usamos o slot retornado pela API.
     const selectedSlot = availableSlots.find(
       (slot) => slot.startTime === selectedTime,
     );
@@ -97,11 +100,13 @@ const Home = () => {
     });
 
     if (response?.success) {
+      // Após sucesso, limpamos a seleção do horário e recarregamos os slots da data.
       setSelectedTime("");
       refetchAvailability();
     }
   };
 
+  // O texto da seção de horários muda conforme o usuário avança no fluxo.
   const availabilityDescription =
     selectedServices.length === 0
       ? "Escolha ao menos um servico para liberar a busca de horarios."

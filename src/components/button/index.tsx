@@ -8,6 +8,7 @@ const Button = ({ title, ...props }: ButtonProps) => {
   return (
     <button
       {...props}
+      // Componente-base para manter o mesmo estilo de ação em formulários simples.
       className="
         h-12
         rounded-xl

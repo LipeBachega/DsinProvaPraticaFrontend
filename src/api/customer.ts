@@ -3,6 +3,7 @@ import type IResponse from "../types/response.type";
 import { API_URL, ApiRequestError } from "./shared";
 
 export async function signUpRequest(payload: ICustomerCreate) {
+  // O cadastro cria um novo cliente comum no backend.
   const response = await fetch(`${API_URL}/customers`, {
     method: "POST",
     headers: {

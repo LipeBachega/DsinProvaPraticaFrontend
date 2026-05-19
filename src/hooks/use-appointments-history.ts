@@ -8,6 +8,7 @@ import type {
 import { formatDateToInput } from "../utils/date";
 
 function getDefaultPeriod(): IAppointmentHistoryQuery {
+  // Abrimos o histórico com uma janela grande para evitar que a tela nasça vazia.
   const now = new Date();
   const startDate = new Date(now.getFullYear() - 1, 0, 1);
   const endDate = new Date(now.getFullYear() + 1, 11, 31);
@@ -19,6 +20,7 @@ function getDefaultPeriod(): IAppointmentHistoryQuery {
 }
 
 export function useAppointmentsHistory() {
+  // A página de histórico depende de período, lista, loading e erro.
   const [period, setPeriod] = useState<IAppointmentHistoryQuery>(getDefaultPeriod);
   const [appointments, setAppointments] = useState<IAppointmentDetail[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +28,7 @@ export function useAppointmentsHistory() {
 
   useEffect(() => {
     async function loadHistory() {
+      // Cada mudança no período dispara uma nova leitura no backend.
       setIsLoading(true);
       setErrorMessage("");
 

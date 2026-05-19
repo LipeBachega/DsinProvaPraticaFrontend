@@ -10,6 +10,7 @@ const HomeHeader = ({
   onLogout,
 }: HomeHeaderProps) => {
   return (
+    // Cabeçalho isolado porque ele concentra navegação da home.
     <header className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-900 px-6 py-5">
       <SectionTitle
         title="Cabeleleila Leila"

@@ -3,6 +3,7 @@ import type { IService } from "../types/service.type";
 import { API_URL, ApiRequestError } from "./shared";
 
 export async function getServicesRequest() {
+  // A home usa esta listagem para montar o catálogo do agendamento.
   const response = await fetch(`${API_URL}/services`);
 
   const data = (await response.json()) as IResponse<IService[]>;

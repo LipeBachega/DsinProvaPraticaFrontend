@@ -4,6 +4,7 @@ import { ApiRequestError } from "../api/shared";
 import type { IAppointmentAvailabilitySlot } from "../types/appointment.type";
 
 export function useAvailability(selectedDate: string, serviceIds: number[]) {
+  // Este hook vive em função de dois filtros: data escolhida e serviços selecionados.
   const [availableSlots, setAvailableSlots] = useState<IAppointmentAvailabilitySlot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -11,6 +12,7 @@ export function useAvailability(selectedDate: string, serviceIds: number[]) {
 
   useEffect(() => {
     async function loadAvailability() {
+      // Sem data ou sem serviço não existe consulta válida de disponibilidade.
       if (!selectedDate || serviceIds.length === 0) {
         setAvailableSlots([]);
         setErrorMessage("");
@@ -41,10 +43,12 @@ export function useAvailability(selectedDate: string, serviceIds: number[]) {
       }
     }
 
+    // O refetch manual é usado após criar agendamento, mesmo sem trocar filtros.
     loadAvailability();
   }, [selectedDate, serviceIds, reloadKey]);
 
   const refetch = () => {
+    // Incrementar a chave força uma nova execução do efeito.
     setReloadKey((current) => current + 1);
   };
 

@@ -33,6 +33,7 @@ const AvailabilitySection = ({
 }: AvailabilitySectionProps) => {
   return (
     <div className="mt-10">
+      {/* Aqui concentramos estados visuais da consulta de disponibilidade. */}
       <SectionTitle title="3. Horarios vagos" description={description} />
 
       {isLoadingAvailability && (
@@ -63,6 +64,7 @@ const AvailabilitySection = ({
         )}
 
       <div className="mt-4 flex flex-wrap gap-3">
+        {/* Cada slot já vem validado pelo backend com duração e conflito considerados. */}
         {availableSlots.map((slot) => (
           <TimeSlotButton
             key={slot.startDateTime}

@@ -1,6 +1,7 @@
 export function formatDateTime(
   value: string | Date,
 ) {
+  // Exibe data e hora no padrão brasileiro para telas e mensagens.
   return new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "short",
     timeStyle: "short",
@@ -10,6 +11,7 @@ export function formatDateTime(
 export function formatHour(
   value: string | Date,
 ) {
+  // Usado quando só precisamos mostrar a hora final de um agendamento.
   return new Intl.DateTimeFormat("pt-BR", {
     hour: "2-digit",
     minute: "2-digit",
@@ -17,10 +19,13 @@ export function formatHour(
 }
 
 export function formatDateToInput(date: Date) {
+  // O input type="date" trabalha no formato YYYY-MM-DD.
   return date.toISOString().split("T")[0];
 }
 
 export function getWeekRangeFromDate(value: string | Date) {
+  // A partir de uma data qualquer, calculamos a segunda e o domingo da mesma semana.
+  // Isso permite perguntar ao backend se o cliente já possui outro agendamento naquele período.
   const date = new Date(value);
   const normalizedDate = new Date(
     date.getFullYear(),

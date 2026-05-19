@@ -13,6 +13,7 @@ import type IResponse from "../types/response.type";
 import { API_URL, ApiRequestError } from "./shared";
 
 function createAuthHeaders() {
+  // Todas as rotas de agendamento exigem token, então centralizamos esse cabeçalho.
   const token = getToken();
 
   return {
@@ -24,6 +25,7 @@ function createAuthHeaders() {
 export async function getAvailabilityRequest(
   query: IAppointmentAvailabilityQuery,
 ) {
+  // A disponibilidade depende da data escolhida e da combinação de serviços.
   const params = new URLSearchParams({
     date: query.date,
     serviceIds: query.serviceIds.join(","),
@@ -46,6 +48,7 @@ export async function getAvailabilityRequest(
 }
 
 export async function createAppointmentRequest(payload: IAppointmentCreateInput) {
+  // Cria o agendamento final usando o horário já validado pela disponibilidade.
   const response = await fetch(`${API_URL}/appointments`, {
     method: "POST",
     headers: createAuthHeaders(),
@@ -67,6 +70,7 @@ export async function createAppointmentRequest(payload: IAppointmentCreateInput)
 export async function getAppointmentHistoryRequest(
   query: IAppointmentHistoryQuery,
 ) {
+  // O histórico é filtrado por período para alimentar a página "Meus agendamentos".
   const params = new URLSearchParams(query);
 
   const response = await fetch(`${API_URL}/appointments/history?${params}`, {
@@ -86,6 +90,7 @@ export async function getAppointmentHistoryRequest(
 }
 
 export async function getAppointmentDetailRequest(id: number) {
+  // Mantido para evoluções futuras, como detalhe individual do agendamento.
   const response = await fetch(`${API_URL}/appointments/${id}`, {
     headers: createAuthHeaders(),
   });
@@ -106,6 +111,7 @@ export async function updateAppointmentRequest(
   id: number,
   payload: IAppointmentUpdateInput,
 ) {
+  // Também fica preparado para futura edição de horários/serviços.
   const response = await fetch(`${API_URL}/appointments/${id}`, {
     method: "PUT",
     headers: createAuthHeaders(),
@@ -128,6 +134,7 @@ export async function updateAppointmentStatusRequest(
   id: number,
   payload: IAppointmentStatusUpdateInput,
 ) {
+  // Fluxo pensado para administração quando status entrar no front.
   const response = await fetch(`${API_URL}/appointments/${id}/status`, {
     method: "PATCH",
     headers: createAuthHeaders(),

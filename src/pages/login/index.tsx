@@ -6,6 +6,7 @@ import Button from "../../components/button";
 import { useLogin } from "../../hooks/use-login";
 
 const Login = () => {
+  // O estado local guarda apenas os valores digitados; a chamada da API fica no hook.
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -18,6 +19,7 @@ const Login = () => {
   const handleLogin = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    // Se a API autenticar, seguimos para a home principal do sistema.
     const response = await submit({ email, password });
 
     if (response?.success) {
@@ -47,6 +49,7 @@ const Login = () => {
         )}
 
         <form onSubmit={handleLogin} className="flex flex-col gap-5">
+          {/* Cada input reflete diretamente o estado do formulário. */}
           <Input
             label="E-mail"
             type="email"

@@ -29,11 +29,13 @@ const AppointmentSummary = ({
   onConfirmAppointment,
 }: AppointmentSummaryProps) => {
   return (
+    // O resumo recebe tudo pronto da home e apenas apresenta/aciona a confirmação.
     <SummaryCard
       title="Resumo do agendamento"
       description="Confira os dados antes de confirmar"
     >
       <div className="flex flex-col gap-5">
+        {/* Mensagens de sucesso, sugestão e erro ficam juntas para o usuário entender o resultado final. */}
         {createAppointmentSuccessMessage && (
           <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
             {createAppointmentSuccessMessage}

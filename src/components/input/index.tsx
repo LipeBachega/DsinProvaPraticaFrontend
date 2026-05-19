@@ -7,6 +7,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 const Input = ({ label, ...props }: InputProps) => {
   return (
     <div className="flex flex-col gap-2">
+      {/* O label fica embutido para padronizar acessibilidade e aparência. */}
       <label className="text-sm text-slate-300">{label}</label>
 
       <input

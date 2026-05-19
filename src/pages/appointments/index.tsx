@@ -11,6 +11,7 @@ import type {
   IAppointmentDetail,
 } from "../../types/appointment.type";
 
+// O filtro "TODOS" é uma convenção visual da tela; os demais valores vêm do domínio.
 type AppointmentFilter = "TODOS" | AppointmentStatus;
 
 const statusLabelMap: Record<AppointmentStatus, string> = {
@@ -28,6 +29,7 @@ const statusClassMap: Record<AppointmentStatus, string> = {
 };
 
 function getAppointmentTotal(appointment: IAppointmentDetail) {
+  // O backend devolve os serviços do agendamento; aqui somamos para exibir o valor final.
   return appointment.services.reduce(
     (total, service) => total + service.price,
     0,
@@ -49,6 +51,7 @@ const Appointments = () => {
   const [activeFilter, setActiveFilter] = useState<AppointmentFilter>("TODOS");
 
   const filteredAppointments = useMemo(() => {
+    // O filtro atua apenas sobre os dados já carregados, sem nova ida ao backend.
     if (activeFilter === "TODOS") {
       return appointments;
     }
@@ -59,6 +62,7 @@ const Appointments = () => {
   }, [activeFilter, appointments]);
 
   const counters = useMemo(() => {
+    // Esses contadores alimentam o painel-resumo por status logo no topo da página.
     return {
       total: appointments.length,
       pendentes: getStatusCount(appointments, "PENDENTE"),
@@ -71,6 +75,7 @@ const Appointments = () => {
   const handlePeriodChange =
     (field: "startDate" | "endDate") =>
     (event: ChangeEvent<HTMLInputElement>) => {
+      // Mudanças de período disparam nova busca no hook de histórico.
       setPeriod((current) => ({
         ...current,
         [field]: event.target.value,
@@ -152,6 +157,7 @@ const Appointments = () => {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
+            {/* Os botões abaixo não pedem nova busca; só filtram visualmente a lista atual. */}
             {(
               [
                 "TODOS",

@@ -4,6 +4,7 @@ import { ApiRequestError } from "../api/shared";
 import type { IService } from "../types/service.type";
 
 export function useServices() {
+  // Responsável por carregar o catálogo público de serviços da home.
   const [services, setServices] = useState<IService[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -24,6 +25,7 @@ export function useServices() {
       }
     }
 
+    // Como os serviços não dependem de outro filtro, basta carregar uma vez ao montar.
     loadServices();
   }, []);
 

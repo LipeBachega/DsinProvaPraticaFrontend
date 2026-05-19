@@ -21,6 +21,7 @@ const ServiceSelection = ({
 }: ServiceSelectionProps) => {
   return (
     <div>
+      {/* Esta seção cuida apenas do catálogo e da seleção visual dos serviços. */}
       <SectionTitle
         title="1. Escolha os servicos"
         description="Selecione um ou mais servicos para consultar os horarios vagos."

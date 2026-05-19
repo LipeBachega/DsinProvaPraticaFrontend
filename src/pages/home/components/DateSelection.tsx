@@ -10,6 +10,7 @@ const DateSelection = ({
   onChangeDate,
 }: DateSelectionProps) => {
   return (
+    // Extraímos a data para manter a home principal focada na orquestração do fluxo.
     <div className="mt-10">
       <SectionTitle
         title="2. Escolha o dia"

@@ -8,11 +8,13 @@ export function useWeeklyAppointmentWarning(
   selectedDate: string,
   selectedServiceIds: number[],
 ) {
+  // Esta checagem avisa antes da confirmação se já existe outro agendamento na mesma semana.
   const [appointments, setAppointments] = useState<IAppointmentDetail[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     async function loadWeekAppointments() {
+      // A checagem só faz sentido quando o usuário já tomou as duas decisões iniciais.
       if (!selectedDate || selectedServiceIds.length === 0) {
         setAppointments([]);
         setErrorMessage("");
@@ -20,6 +22,7 @@ export function useWeeklyAppointmentWarning(
       }
 
       try {
+        // Em vez de "adivinhar", consultamos o histórico real do cliente no período da semana.
         const period = getWeekRangeFromDate(selectedDate);
         const response = await getAppointmentHistoryRequest(period);
         setAppointments(response.data ?? []);
@@ -42,6 +45,7 @@ export function useWeeklyAppointmentWarning(
       return "";
     }
 
+    // Mostramos a primeira data encontrada para deixar o aviso mais útil e concreto.
     const firstAppointment = appointments[0];
     const formattedDate = formatDateTime(firstAppointment.startDate);
 

@@ -6,6 +6,7 @@ import Button from "../../components/button";
 import { useSignUp } from "../../hooks/use-signup";
 
 const SignUp = () => {
+  // A tela mantém apenas os valores brutos; validação e envio ficam no hook.
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -17,6 +18,7 @@ const SignUp = () => {
   const handleSignUp = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    // Enviamos todos os campos exigidos pelo backend de cliente.
     const response = await submit({
       name,
       email,
@@ -25,6 +27,7 @@ const SignUp = () => {
     });
 
     if (response?.success) {
+      // Após cadastro bem-sucedido, voltamos ao login com uma mensagem de contexto.
       navigate("/login", {
         state: {
           successMessage: "Conta criada com sucesso. Agora voce ja pode entrar.",
@@ -51,6 +54,7 @@ const SignUp = () => {
         )}
 
         <form onSubmit={handleSignUp} className="flex flex-col gap-5">
+          {/* Erros por campo são exibidos logo abaixo do input correspondente. */}
           <Input
             label="Nome"
             type="text"
