@@ -1,17 +1,11 @@
-export function formatDateTime(
-  value: string | Date,
-) {
-  // Exibe data e hora no padrão brasileiro para telas e mensagens.
+export function formatDateTime(value: string | Date) {
   return new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "short",
     timeStyle: "short",
   }).format(new Date(value));
 }
 
-export function formatHour(
-  value: string | Date,
-) {
-  // Usado quando só precisamos mostrar a hora final de um agendamento.
+export function formatHour(value: string | Date) {
   return new Intl.DateTimeFormat("pt-BR", {
     hour: "2-digit",
     minute: "2-digit",

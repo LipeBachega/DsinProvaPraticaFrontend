@@ -36,6 +36,7 @@ function getAppointmentTotal(appointment: IAppointmentDetail) {
   );
 }
 
+// Aqui contamos os agendamentos por status.
 function getStatusCount(
   appointments: IAppointmentDetail[],
   status: AppointmentStatus,

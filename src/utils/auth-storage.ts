@@ -6,7 +6,6 @@ export function saveToken(token: string) {
 }
 
 export function removeToken() {
-  // Esta função será útil quando implementarmos logout real.
   localStorage.removeItem(TOKEN_KEY);
 }
 

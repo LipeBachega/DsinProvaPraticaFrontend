@@ -49,7 +49,6 @@ const Login = () => {
         )}
 
         <form onSubmit={handleLogin} className="flex flex-col gap-5">
-          {/* Cada input reflete diretamente o estado do formulário. */}
           <Input
             label="E-mail"
             type="email"
@@ -66,7 +65,11 @@ const Login = () => {
             onChange={(event) => setPassword(event.target.value)}
           />
 
-          <Button type="submit" title={isLoading ? "Entrando..." : "Entrar"} disabled={isLoading} />
+          <Button
+            type="submit"
+            title={isLoading ? "Entrando..." : "Entrar"}
+            disabled={isLoading}
+          />
 
           <Button
             type="button"

@@ -31,11 +31,15 @@ export async function getAvailabilityRequest(
     serviceIds: query.serviceIds.join(","),
   });
 
-  const response = await fetch(`${API_URL}/appointments/availability?${params}`, {
-    headers: createAuthHeaders(),
-  });
+  const response = await fetch(
+    `${API_URL}/appointments/availability?${params}`,
+    {
+      headers: createAuthHeaders(),
+    },
+  );
 
-  const data = (await response.json()) as IResponse<IAppointmentAvailabilityResponse>;
+  const data =
+    (await response.json()) as IResponse<IAppointmentAvailabilityResponse>;
 
   if (!response.ok || !data.success) {
     throw new ApiRequestError(
@@ -47,7 +51,9 @@ export async function getAvailabilityRequest(
   return data;
 }
 
-export async function createAppointmentRequest(payload: IAppointmentCreateInput) {
+export async function createAppointmentRequest(
+  payload: IAppointmentCreateInput,
+) {
   // Cria o agendamento final usando o horário já validado pela disponibilidade.
   const response = await fetch(`${API_URL}/appointments`, {
     method: "POST",
@@ -71,7 +77,7 @@ export async function getAppointmentHistoryRequest(
   query: IAppointmentHistoryQuery,
 ) {
   // O histórico é filtrado por período para alimentar a página "Meus agendamentos".
-  const params = new URLSearchParams(query);
+  const params = new URLSearchParams();
 
   const response = await fetch(`${API_URL}/appointments/history?${params}`, {
     headers: createAuthHeaders(),

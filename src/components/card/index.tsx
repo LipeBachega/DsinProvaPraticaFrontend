@@ -7,7 +7,6 @@ interface CardProps {
 const Card = ({ children }: CardProps) => {
   return (
     <div
-      // Wrapper reutilizado nas telas de autenticação para manter o mesmo layout.
       className="
         w-full
         max-w-md
