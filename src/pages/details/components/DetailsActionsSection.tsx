@@ -89,13 +89,6 @@ const DetailsActionsSection = ({
         </div>
       )}
 
-      {canManageAppointment && !canReschedule && (
-        <div className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-          Este agendamento só pode ser alterado por telefone neste momento,
-          conforme a regra do desafio.
-        </div>
-      )}
-
       {canManageAppointment && canReschedule && (
         <RescheduleSection
           selectedDate={selectedDate}
