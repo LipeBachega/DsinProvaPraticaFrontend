@@ -13,3 +13,7 @@ body {
   color: white;
   font-family: sans-serif;
 }
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
